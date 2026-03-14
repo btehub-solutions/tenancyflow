@@ -130,8 +130,11 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# Whitenoise storage for production static files compression and caching
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# Whitenoise configuration for production
+# USE_FINDERS=True allows WhiteNoise to find files in STATICFILES_DIRS even if collectstatic hasn't run
+WHITENOISE_USE_FINDERS = True
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+WHITENOISE_KEEP_ONLY_HASHED_FILES = True
 
 # Media files (uploads)
 MEDIA_URL = '/media/'
