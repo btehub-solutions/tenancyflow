@@ -5,8 +5,258 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Login{% endblock %} | TenancyFlow</title>
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>">
+    <style>
+        :root {
+            --primary: #4F46E5;
+            --primary-hover: #4338CA;
+            --bg-color: #f3f4f6;
+            --text-main: #111827;
+            --text-muted: #6b7280;
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --card-border: rgba(255, 255, 255, 0.4);
+            --success: #10B981;
+            --danger: #EF4444;
+            --input-border: #D1D5DB;
+            --input-focus: #4F46E5;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-glass: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.15) 0, transparent 50%), 
+                radial-gradient(at 50% 0%, rgba(16, 185, 129, 0.1) 0, transparent 50%), 
+                radial-gradient(at 100% 0%, rgba(236, 72, 153, 0.15) 0, transparent 50%);
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center;
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            animation: fadeIn 1s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .auth-container {
+            width: 100%;
+            max-width: 440px;
+        }
+
+        .auth-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 3rem 2.5rem;
+            box-shadow: var(--shadow-glass);
+            animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .auth-brand {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .brand-icon {
+            font-size: 3.5rem;
+            line-height: 1;
+            margin-bottom: 1rem;
+            display: inline-block;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+            animation: bounce 3s infinite ease-in-out;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .auth-brand h2 {
+            font-size: 1.85rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #1f2937;
+            letter-spacing: -0.025em;
+        }
+
+        .auth-brand p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .alert-danger {
+            background-color: #FEF2F2;
+            border-left: 4px solid var(--danger);
+            color: #B91C1C;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+            text-align: left;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 1px solid var(--input-border);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            background-color: rgba(255, 255, 255, 0.9);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--input-focus);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15);
+            background-color: #fff;
+        }
+
+        .form-input::placeholder {
+            color: #9CA3AF;
+        }
+
+        .btn-primary {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+            color: white;
+            border: none;
+            padding: 0.875rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3), 0 2px 4px -1px rgba(79, 70, 229, 0.2);
+            margin-top: 0.75rem;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.4), 0 4px 6px -2px rgba(79, 70, 229, 0.2);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary .arrow {
+            margin-left: 0.5rem;
+            transition: transform 0.2s ease;
+        }
+
+        .btn-primary:hover .arrow {
+            transform: translateX(4px);
+        }
+
+        .auth-footer {
+            margin-top: 2rem;
+            text-align: center;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(0,0,0,0.05);
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .auth-footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s;
+            display: inline-block;
+            margin-top: 0.25rem;
+        }
+
+        .auth-footer a:hover {
+            color: var(--primary-hover);
+            text-decoration: underline;
+        }
+
+        /* Dark mode compatibility */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #111827;
+                background-image: 
+                    radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.15) 0, transparent 50%), 
+                    radial-gradient(at 50% 0%, rgba(16, 185, 129, 0.05) 0, transparent 50%), 
+                    radial-gradient(at 100% 0%, rgba(236, 72, 153, 0.1) 0, transparent 50%);
+            }
+            .auth-card {
+                background: rgba(31, 41, 55, 0.65);
+                border-color: rgba(255, 255, 255, 0.08);
+            }
+            .auth-brand h2 {
+                color: #F9FAFB;
+            }
+            .auth-brand p {
+                color: #D1D5DB;
+            }
+            .form-label {
+                color: #E5E7EB;
+            }
+            .form-input {
+                background-color: rgba(17, 24, 39, 0.7);
+                border-color: #374151;
+                color: #F9FAFB;
+            }
+            .form-input:focus {
+                background-color: rgba(17, 24, 39, 0.9);
+                border-color: var(--primary);
+            }
+            .auth-footer {
+                border-top-color: rgba(255,255,255,0.05);
+            }
+            .alert-danger {
+                background-color: rgba(239, 68, 68, 0.1);
+                color: #F87171;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="auth-page">
@@ -20,6 +270,9 @@
 
                 {% if form.errors %}
                     <div class="alert alert-danger">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                        </svg>
                         <span>Invalid username or password. Please try again.</span>
                     </div>
                 {% endif %}
@@ -34,14 +287,14 @@
                         <label class="form-label" for="id_password">Password</label>
                         {{ form.password }}
                     </div>
-                    <button type="submit" class="btn btn-primary btn-lg" style="width: 100%;">
-                        Sign In →
+                    <button type="submit" class="btn btn-primary">
+                        Sign In <span class="arrow">→</span>
                     </button>
                 </form>
 
-                <div class="auth-footer" style="padding-top: var(--space-xl); font-size: 0.85rem; color: var(--gray-600);">
+                <div class="auth-footer">
                     Want to use TenancyFlow for your property management? <br>
-                    <a href="mailto:hello@tenancyflow.com" style="color: var(--primary-color); font-weight: 500; text-decoration: none;">Contact Sales for an Invite</a>
+                    <a href="mailto:hello@tenancyflow.com">Contact Sales for an Invite</a>
                 </div>
             </div>
         </div>
