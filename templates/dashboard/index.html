@@ -50,7 +50,7 @@
         <h4 class="text-slate-500 dark:text-slate-400 text-sm font-medium mb-1">Total Properties</h4>
         <div class="flex items-baseline gap-2">
             <span class="text-3xl font-bold dark:text-white" x-data="{ count: 0, target: {{ total_properties }} }" x-init="let timer = setInterval(() => { if (count < target) count++; else clearInterval(timer) }, 50)" x-text="count">0</span>
-            <span class="text-slate-400 text-sm">Units</span>
+            <span class="text-slate-400 dark:text-slate-500 text-sm">Units</span>
         </div>
         <div class="mt-4 h-1 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
             <div class="h-full bg-teal-500 rounded-full" style="width: 70%"></div>
@@ -134,7 +134,7 @@
         <div class="p-8 border-b border-slate-200/50 dark:border-slate-800/50 flex items-center justify-between bg-white/30 dark:bg-slate-900/10 backdrop-blur-md">
             <div>
                 <h3 class="text-xl font-bold dark:text-white">Revenue & Growth</h3>
-                <p class="text-sm text-slate-500">Live performance tracking across all 2026 pipelines</p>
+                <p class="text-sm text-slate-500 dark:text-slate-400">Live performance tracking across all 2026 pipelines</p>
             </div>
             <div class="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
                 <button class="px-4 py-1.5 text-xs font-bold rounded-lg bg-white dark:bg-slate-700 shadow-sm text-slate-900 dark:text-white">Monthly</button>
@@ -151,7 +151,7 @@
     <!-- Occupancy Donut -->
     <div class="glass-card rounded-3xl p-8 animate-slide-up" style="animation-delay: 0.6s">
         <h3 class="text-xl font-bold dark:text-white mb-2">Unit Occupancy</h3>
-        <p class="text-sm text-slate-500 mb-8">Capacity utilization map</p>
+        <p class="text-sm text-slate-500 dark:text-slate-400 mb-8">Capacity utilization map</p>
         
         <div class="relative h-64 mb-8">
             <canvas id="occupancyDonutChart"></canvas>
@@ -210,7 +210,7 @@
                                 </div>
                                 <div>
                                     <p class="text-sm font-bold dark:text-white leading-tight mb-0.5">{{ payment.tenant.name }}</p>
-                                    <p class="text-xs text-slate-500">{{ payment.tenant.building.name }}</p>
+                                    <p class="text-xs text-slate-500 dark:text-slate-400">{{ payment.tenant.building.name }}</p>
                                 </div>
                             </div>
                         </td>
@@ -232,7 +232,7 @@
                     <i data-lucide="credit-card" class="w-8 h-8 text-slate-400"></i>
                 </div>
                 <h4 class="text-lg font-bold dark:text-white mb-2">Digital Vault is Empty</h4>
-                <p class="text-sm text-slate-500 mb-6">No payment records found in this cycle.</p>
+                <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">No payment records found in this cycle.</p>
                 <a href="{% url 'payments:create' %}" class="inline-flex py-3 px-6 rounded-2xl bg-slate-900 dark:bg-teal-500 text-white font-bold text-sm shadow-xl transition-all hover:scale-105">+ Record First Payment</a>
             </div>
             {% endif %}
@@ -258,7 +258,7 @@
                     </div>
                     <div class="flex-1">
                         <p class="text-sm font-bold dark:text-white mb-0.5 group-hover:text-orange-600 transition-colors">{{ tenant.name }}</p>
-                        <p class="text-xs text-slate-500">{{ tenant.building.name }} — <span class="text-orange-500 font-medium">Expiring in {{ tenant.tenancy_end|timeuntil }}</span></p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">{{ tenant.building.name }} — <span class="text-orange-500 font-medium">Expiring in {{ tenant.tenancy_end|timeuntil }}</span></p>
                     </div>
                     <button class="w-8 h-8 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-teal-500 transition-colors">
                         <i data-lucide="mail" class="w-4 h-4"></i>

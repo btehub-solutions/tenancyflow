@@ -83,7 +83,7 @@
                             </div>
                             <div>
                                 <p class="text-sm font-bold text-slate-900 dark:text-white">{{ payment.tenant.name }}</p>
-                                <p class="text-[10px] text-slate-500 uppercase tracking-widest">{{ payment.payment_date|date:"d M Y" }}</p>
+                                <p class="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-widest">{{ payment.payment_date|date:"d M Y" }}</p>
                             </div>
                         </div>
                     </td>
@@ -94,7 +94,7 @@
                         <p class="text-sm font-black dark:text-white">₦{{ payment.amount|intcomma }}</p>
                     </td>
                     <td class="px-6 py-4">
-                        <span class="text-xs font-bold text-slate-500 flex items-center gap-1.5">
+                        <span class="text-xs font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
                             <i data-lucide="{% if payment.payment_method == 'transfer' %}arrow-right-left{% elif payment.payment_method == 'cash' %}banknote{% else %}credit-card{% endif %}" class="w-3.5 h-3.5"></i>
                             {{ payment.get_payment_method_display }}
                         </span>
@@ -128,7 +128,7 @@
         <i data-lucide="receipt" class="w-12 h-12"></i>
     </div>
     <h3 class="text-3xl font-bold dark:text-white mb-4">No transactions found</h3>
-    <p class="text-slate-500 max-w-md mx-auto mb-10 text-lg">Your revenue stream is currently quiet. Record a payment to start tracking your cash flow.</p>
+    <p class="text-slate-500 dark:text-slate-400 max-w-md mx-auto mb-10 text-lg">Your revenue stream is currently quiet. Record a payment to start tracking your cash flow.</p>
     <a href="{% url 'payments:create' %}" class="inline-flex items-center gap-3 py-4 px-10 rounded-2xl bg-slate-900 dark:bg-teal-500 text-white font-bold text-lg shadow-2xl transition-all hover:scale-105">
         <i data-lucide="plus-circle" class="w-6 h-6"></i>
         Record First Payment
