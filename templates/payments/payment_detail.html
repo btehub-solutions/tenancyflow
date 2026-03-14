@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Payment Details{% endblock %}
+{% block page_title %}Payment Details{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 600px;">
+    <div class="card-body">
+        <div class="detail-info-grid" style="grid-template-columns: 1fr;">
+            <div class="detail-info-item">
+                <div class="detail-info-label">Tenant</div>
+                <div class="detail-info-value">
+                    <a href="{% url 'tenants:detail' pk=payment.tenant.pk %}">{{ payment.tenant.name }}</a>
+                </div>
+            </div>
+            <div class="detail-info-item">
+                <div class="detail-info-label">Property</div>
+                <div class="detail-info-value">{{ payment.tenant.building.name }}</div>
+            </div>
+            <div class="detail-info-item">
+                <div class="detail-info-label">Amount</div>
+                <div class="detail-info-value" style="font-size: 1.3rem;">₦{{ payment.amount|intcomma }}</div>
+            </div>
+            <div class="detail-info-item">
+                <div class="detail-info-label">Payment Date</div>
+                <div class="detail-info-value">{{ payment.payment_date|date:"F d, Y" }}</div>
+            </div>
+            <div class="detail-info-item">
+                <div class="detail-info-label">Method</div>
+                <div class="detail-info-value">{{ payment.get_payment_method_display }}</div>
+            </div>
+            <div class="detail-info-item">
+                <div class="detail-info-label">Status</div>
+                <div class="detail-info-value">
+                    <span class="badge {% if payment.status == 'confirmed' %}badge-success{% elif payment.status == 'pending' %}badge-warning{% else %}badge-danger{% endif %}">
+                        {{ payment.get_status_display }}
+                    </span>
+                </div>
+            </div>
+            {% if payment.reference %}
+            <div class="detail-info-item">
+                <div class="detail-info-label">Reference</div>
+                <div class="detail-info-value">{{ payment.reference }}</div>
+            </div>
+            {% endif %}
+            {% if payment.description %}
+            <div class="detail-info-item">
+                <div class="detail-info-label">Description</div>
+                <div class="detail-info-value">{{ payment.description }}</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="card-footer" style="display: flex; gap: var(--space-md);">
+        <a href="{% url 'payments:list' %}" class="btn btn-secondary">← Back to Payments</a>
+        <a href="{% url 'payments:delete' pk=payment.pk %}" class="btn btn-danger btn-sm">🗑️ Delete</a>
+    </div>
+</div>
+{% endblock %}

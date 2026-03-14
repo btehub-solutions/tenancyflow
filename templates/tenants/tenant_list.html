@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Tenants{% endblock %}
+{% block page_title %}Tenants{% endblock %}
+{% block page_subtitle %}{{ total_tenants }} tenant{{ total_tenants|pluralize }} across all properties{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'tenants:create' %}" class="btn btn-primary">+ Add Tenant</a>
+{% endblock %}
+
+{% block content %}
+<form method="get" class="filter-bar">
+    <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" name="search" value="{{ search }}" placeholder="Search tenants..." class="form-input">
+    </div>
+    <select name="property" class="filter-select" onchange="this.form.submit()">
+        <option value="">All Properties</option>
+        {% for prop in properties %}
+        <option value="{{ prop.pk }}" {% if property_filter == prop.pk|stringformat:"d" %}selected{% endif %}>{{ prop.name }}</option>
+        {% endfor %}
+    </select>
+    <select name="status" class="filter-select" onchange="this.form.submit()">
+        <option value="">All Status</option>
+        <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
+        <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>Inactive</option>
+    </select>
+    <button type="submit" class="btn btn-secondary">Search</button>
+</form>
+
+{% if tenants %}
+<div class="table-container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Tenant</th>
+                <th>Property</th>
+                <th>Flat/Room</th>
+                <th>Phone</th>
+                <th>Rent (₦)</th>
+                <th>Balance (₦)</th>
+                <th>Tenancy End</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for tenant in tenants %}
+            <tr>
+                <td>
+                    <a href="{% url 'tenants:detail' pk=tenant.pk %}"><strong>{{ tenant.name }}</strong></a>
+                </td>
+                <td>
+                    <a href="{% url 'properties:detail' pk=tenant.building.pk %}">{{ tenant.building.name }}</a>
+                </td>
+                <td>{{ tenant.flat_or_room }}</td>
+                <td>{{ tenant.phone|default:"-" }}</td>
+                <td>₦{{ tenant.rent_amount|intcomma }}</td>
+                <td>
+                    {% if tenant.balance > 0 %}
+                        <span class="text-danger font-bold">₦{{ tenant.balance|intcomma }}</span>
+                    {% else %}
+                        <span class="badge badge-success">Paid</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if tenant.tenancy_end %}
+                        {% if tenant.tenancy_status == 'expired' %}
+                            <span class="badge badge-danger">Expired {{ tenant.tenancy_end|date:"M d, Y" }}</span>
+                        {% elif tenant.tenancy_status == 'expiring_soon' %}
+                            <span class="badge badge-warning">{{ tenant.tenancy_end|date:"M d, Y" }}</span>
+                        {% else %}
+                            {{ tenant.tenancy_end|date:"M d, Y" }}
+                        {% endif %}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>
+                    {% if tenant.is_active %}
+                        <span class="badge badge-success">Active</span>
+                    {% else %}
+                        <span class="badge badge-gray">Inactive</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <div style="display: flex; gap: 4px;">
+                        <a href="{% url 'tenants:detail' pk=tenant.pk %}" class="btn btn-sm btn-secondary">👁️</a>
+                        <a href="{% url 'payments:create' %}?tenant={{ tenant.pk }}" class="btn btn-sm btn-success">💰</a>
+                        <a href="{% url 'tenants:update' pk=tenant.pk %}" class="btn btn-sm btn-secondary">✏️</a>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="card">
+    <div class="empty-state">
+        <div class="empty-state-icon">👥</div>
+        <h3>No tenants found</h3>
+        <p>{% if search or status_filter or property_filter %}Try adjusting your search criteria.{% else %}Add your first tenant to start tracking.{% endif %}</p>
+        <a href="{% url 'tenants:create' %}" class="btn btn-primary">+ Add Tenant</a>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}{{ tenant.name }}{% endblock %}
+{% block page_title %}{{ tenant.name }}{% endblock %}
+{% block page_subtitle %}{{ tenant.flat_or_room }} at {{ tenant.building.name }}{% endblock %}
+
+{% block page_actions %}
+<div style="display: flex; gap: var(--space-sm);">
+    <a href="{% url 'payments:create' %}?tenant={{ tenant.pk }}" class="btn btn-success">💰 Record Payment</a>
+    <a href="{% url 'tenants:update' pk=tenant.pk %}" class="btn btn-secondary">✏️ Edit</a>
+    <a href="{% url 'tenants:delete' pk=tenant.pk %}" class="btn btn-danger btn-sm">🗑️</a>
+</div>
+{% endblock %}
+
+{% block content %}
+<!-- Financial Summary Stats -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon accent">💵</div>
+        <div class="stat-value">₦{{ tenant.rent_amount|intcomma }}</div>
+        <div class="stat-label">Rent Amount</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon info">📋</div>
+        <div class="stat-value">₦{{ tenant.total_due|intcomma }}</div>
+        <div class="stat-label">Total Due</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon success">✅</div>
+        <div class="stat-value">₦{{ tenant.total_paid|intcomma }}</div>
+        <div class="stat-label">Total Paid</div>
+    </div>
+    <div class="stat-card {% if tenant.balance > 0 %}danger{% endif %}">
+        <div class="stat-icon {% if tenant.balance > 0 %}danger{% else %}success{% endif %}">
+            {% if tenant.balance > 0 %}⚠️{% else %}🎉{% endif %}
+        </div>
+        <div class="stat-value">₦{{ tenant.balance|intcomma }}</div>
+        <div class="stat-label">Outstanding Balance</div>
+    </div>
+</div>
+
+<!-- Tenant Details -->
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-xl);">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Personal Details</h3>
+        </div>
+        <div class="card-body">
+            <div class="detail-info-grid" style="grid-template-columns: 1fr;">
+                <div class="detail-info-item">
+                    <div class="detail-info-label">Full Name</div>
+                    <div class="detail-info-value">{{ tenant.name }}</div>
+                </div>
+                <div class="detail-info-item">
+                    <div class="detail-info-label">Phone</div>
+                    <div class="detail-info-value">{{ tenant.phone|default:"Not provided" }}</div>
+                </div>
+                <div class="detail-info-item">
+                    <div class="detail-info-label">Email</div>
+                    <div class="detail-info-value">{{ tenant.email|default:"Not provided" }}</div>
+                </div>
+                <div class="detail-info-item">
+                    <div class="detail-info-label">Status</div>
+                    <div class="detail-info-value">
+                        {% if tenant.is_active %}
+                            <span class="badge badge-success">Active</span>
+                        {% else %}
+                            <span class="badge badge-gray">Inactive</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% if tenant.emergency_contact_name %}
+                <div class="detail-info-item">
+                    <div class="detail-info-label">Emergency Contact</div>
+                    <div class="detail-info-value">{{ tenant.emergency_contact_name }} ({{ tenant.emergency_contact_phone }})</div>
+                </div>
+                {% endif %}
+                {% if tenant.remarks %}
+                <div class="detail-info-item">
+                    <div class="detail-info-label">Remarks</div>
+                    <div class="detail-info-value">{{ tenant.remarks }}</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Tenancy & Financial</h3>
+        </div>
+        <div class="card-body">
+            <div class="detail-info-grid" style="grid-template-columns: 1fr;">
+                <div class="detail-info-item">
+                    <div class="detail-info-label">Property</div>
+                    <div class="detail-info-value">
+                        <a href="{% url 'properties:detail' pk=tenant.building.pk %}">{{ tenant.building.name }}</a>
+                    </div>
+                </div>
+                <div class="detail-info-item">
+                    <div class="detail-info-label">Flat / Room</div>
+                    <div class="detail-info-value">{{ tenant.flat_or_room }}</div>
+                </div>
+                <div class="detail-info-item">
+                    <div class="detail-info-label">Agreement Fee</div>
+                    <div class="detail-info-value">₦{{ tenant.agreement_fee|intcomma }}</div>
+                </div>
+                <div class="detail-info-item">
+                    <div class="detail-info-label">Caution Fee</div>
+                    <div class="detail-info-value">₦{{ tenant.caution_fee|intcomma }}</div>
+                </div>
+                <div class="detail-info-item">
+                    <div class="detail-info-label">Tenancy Period</div>
+                    <div class="detail-info-value">
+                        {% if tenant.tenancy_start and tenant.tenancy_end %}
+                            {{ tenant.tenancy_start|date:"M d, Y" }} — {{ tenant.tenancy_end|date:"M d, Y" }}
+                        {% else %}
+                            Not set
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Payment History -->
+<div class="card" style="margin-top: var(--space-xl);">
+    <div class="card-header">
+        <h3 class="card-title">Payment History</h3>
+        <a href="{% url 'payments:create' %}?tenant={{ tenant.pk }}" class="btn btn-sm btn-success">+ Record Payment</a>
+    </div>
+    {% if payments %}
+    <div class="table-container" style="border: none; border-radius: 0;">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Amount</th>
+                    <th>Method</th>
+                    <th>Reference</th>
+                    <th>Status</th>
+                    <th>Recorded By</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for payment in payments %}
+                <tr>
+                    <td>{{ payment.payment_date|date:"M d, Y" }}</td>
+                    <td><strong>₦{{ payment.amount|intcomma }}</strong></td>
+                    <td>{{ payment.get_payment_method_display }}</td>
+                    <td>{{ payment.reference|default:"-" }}</td>
+                    <td>
+                        <span class="badge {% if payment.status == 'confirmed' %}badge-success{% elif payment.status == 'pending' %}badge-warning{% else %}badge-danger{% endif %}">
+                            {{ payment.get_status_display }}
+                        </span>
+                    </td>
+                    <td>{{ payment.recorded_by|default:"-" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="card-body">
+        <div class="empty-state">
+            <div class="empty-state-icon">💳</div>
+            <h3>No payments recorded</h3>
+            <p>Record the first payment for this tenant.</p>
+            <a href="{% url 'payments:create' %}?tenant={{ tenant.pk }}" class="btn btn-success">💰 Record Payment</a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

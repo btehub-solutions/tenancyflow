@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Properties{% endblock %}
+{% block page_title %}Properties{% endblock %}
+{% block page_subtitle %}{{ total_properties }} propert{{ total_properties|pluralize:"y,ies" }} under management{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'properties:create' %}" class="btn btn-primary">+ Add Property</a>
+{% endblock %}
+
+{% block content %}
+<!-- Filter Bar -->
+<form method="get" class="filter-bar">
+    <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" name="search" value="{{ search }}" placeholder="Search properties..." class="form-input">
+    </div>
+    <select name="status" class="filter-select" onchange="this.form.submit()">
+        <option value="">All Status</option>
+        <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
+        <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>Inactive</option>
+        <option value="maintenance" {% if status_filter == 'maintenance' %}selected{% endif %}>Under Maintenance</option>
+    </select>
+    <select name="type" class="filter-select" onchange="this.form.submit()">
+        <option value="">All Types</option>
+        <option value="residential" {% if type_filter == 'residential' %}selected{% endif %}>Residential</option>
+        <option value="commercial" {% if type_filter == 'commercial' %}selected{% endif %}>Commercial</option>
+        <option value="mixed" {% if type_filter == 'mixed' %}selected{% endif %}>Mixed Use</option>
+    </select>
+    <button type="submit" class="btn btn-secondary">Search</button>
+</form>
+
+{% if properties %}
+<div class="property-grid">
+    {% for property in properties %}
+    <a href="{% url 'properties:detail' pk=property.pk %}" class="property-card animate-in" style="text-decoration: none; color: inherit;">
+        <div class="property-card-image">
+            {% if property.image %}
+                <img src="{{ property.image.url }}" alt="{{ property.name }}">
+            {% else %}
+                🏢
+            {% endif %}
+            <div class="property-card-badge">
+                <span class="badge {% if property.status == 'active' %}badge-success{% elif property.status == 'maintenance' %}badge-warning{% else %}badge-gray{% endif %}">
+                    {{ property.get_status_display }}
+                </span>
+            </div>
+        </div>
+        <div class="property-card-body">
+            <div class="property-card-name">{{ property.name }}</div>
+            <div class="property-card-address">📍 {{ property.address|truncatewords:10 }}</div>
+            <div class="property-card-stats">
+                <div class="property-stat">
+                    <div class="property-stat-value">{{ property.total_units }}</div>
+                    <div class="property-stat-label">Units</div>
+                </div>
+                <div class="property-stat">
+                    <div class="property-stat-value">{{ property.occupied_units }}</div>
+                    <div class="property-stat-label">Occupied</div>
+                </div>
+                <div class="property-stat">
+                    <div class="property-stat-value" style="color: {% if property.occupancy_rate >= 80 %}var(--success){% elif property.occupancy_rate >= 50 %}var(--warning){% else %}var(--danger){% endif %};">
+                        {{ property.occupancy_rate }}%
+                    </div>
+                    <div class="property-stat-label">Occupancy</div>
+                </div>
+            </div>
+        </div>
+    </a>
+    {% endfor %}
+</div>
+{% else %}
+<div class="card">
+    <div class="empty-state">
+        <div class="empty-state-icon">🏢</div>
+        <h3>No properties yet</h3>
+        <p>Add your first property to start managing tenants and tracking payments.</p>
+        <a href="{% url 'properties:create' %}" class="btn btn-primary">+ Add Your First Property</a>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

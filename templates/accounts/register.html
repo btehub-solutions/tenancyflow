@@ -1,0 +1,87 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register | TenancyFlow</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>">
+</head>
+<body>
+    <div class="auth-page">
+        <div class="auth-container" style="max-width: 520px;">
+            <div class="auth-card">
+                <div class="auth-brand">
+                    <div class="brand-icon">🏠</div>
+                    <h2>Create Your Account</h2>
+                    <p>Start managing your properties like a pro</p>
+                </div>
+
+                {% if form.errors %}
+                    <div class="alert alert-danger">
+                        <span>Please correct the errors below.</span>
+                    </div>
+                {% endif %}
+
+                <form method="post" action="{% url 'accounts:register' %}">
+                    {% csrf_token %}
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="id_first_name">First Name</label>
+                            {{ form.first_name }}
+                            {% if form.first_name.errors %}<p class="form-error">{{ form.first_name.errors.0 }}</p>{% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="id_last_name">Last Name</label>
+                            {{ form.last_name }}
+                            {% if form.last_name.errors %}<p class="form-error">{{ form.last_name.errors.0 }}</p>{% endif %}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="id_company_name">Company / Agency Name</label>
+                        {{ form.company_name }}
+                        {% if form.company_name.errors %}<p class="form-error">{{ form.company_name.errors.0 }}</p>{% endif %}
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="id_email">Email Address</label>
+                            {{ form.email }}
+                            {% if form.email.errors %}<p class="form-error">{{ form.email.errors.0 }}</p>{% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="id_phone">Phone Number</label>
+                            {{ form.phone }}
+                            {% if form.phone.errors %}<p class="form-error">{{ form.phone.errors.0 }}</p>{% endif %}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="id_username">Username</label>
+                        {{ form.username }}
+                        {% if form.username.errors %}<p class="form-error">{{ form.username.errors.0 }}</p>{% endif %}
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="id_password1">Password</label>
+                            {{ form.password1 }}
+                            {% if form.password1.errors %}<p class="form-error">{{ form.password1.errors.0 }}</p>{% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="id_password2">Confirm Password</label>
+                            {{ form.password2 }}
+                            {% if form.password2.errors %}<p class="form-error">{{ form.password2.errors.0 }}</p>{% endif %}
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg" style="width: 100%;">
+                        Create Account →
+                    </button>
+                </form>
+
+                <div class="auth-footer">
+                    Already have an account? <a href="{% url 'accounts:login' %}">Sign in</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

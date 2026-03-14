@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block page_subtitle %}{% if tenant %}Edit {{ tenant.name }}'s details{% else %}Fill in the tenant information{% endif %}{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 800px;">
+    <div class="card-header">
+        <h3 class="card-title">Tenant Information</h3>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label class="form-label">Property *</label>
+                {{ form.building }}
+                {% if form.building.errors %}<p class="form-error">{{ form.building.errors.0 }}</p>{% endif %}
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Tenant Name *</label>
+                    {{ form.name }}
+                    {% if form.name.errors %}<p class="form-error">{{ form.name.errors.0 }}</p>{% endif %}
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Flat / Room *</label>
+                    {{ form.flat_or_room }}
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Phone Number</label>
+                    {{ form.phone }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    {{ form.email }}
+                </div>
+            </div>
+
+            <hr style="border: none; border-top: 1px solid var(--gray-200); margin: var(--space-xl) 0;">
+            <h4 style="font-size: 0.9rem; font-weight: 700; color: var(--gray-700); margin-bottom: var(--space-lg);">💰 Financial Details</h4>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Rent Amount (₦)</label>
+                    {{ form.rent_amount }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Agreement Fee (₦)</label>
+                    {{ form.agreement_fee }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Caution Fee (₦)</label>
+                    {{ form.caution_fee }}
+                </div>
+            </div>
+
+            <hr style="border: none; border-top: 1px solid var(--gray-200); margin: var(--space-xl) 0;">
+            <h4 style="font-size: 0.9rem; font-weight: 700; color: var(--gray-700); margin-bottom: var(--space-lg);">📅 Tenancy Period</h4>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Tenancy Start Date</label>
+                    {{ form.tenancy_start }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Tenancy End Date</label>
+                    {{ form.tenancy_end }}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label style="display: flex; align-items: center; gap: var(--space-sm); cursor: pointer;">
+                    {{ form.is_active }}
+                    <span class="form-label" style="margin: 0;">Active Tenant</span>
+                </label>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Remarks</label>
+                {{ form.remarks }}
+            </div>
+
+            <hr style="border: none; border-top: 1px solid var(--gray-200); margin: var(--space-xl) 0;">
+            <h4 style="font-size: 0.9rem; font-weight: 700; color: var(--gray-700); margin-bottom: var(--space-lg);">🆘 Emergency Contact</h4>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Contact Name</label>
+                    {{ form.emergency_contact_name }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Contact Phone</label>
+                    {{ form.emergency_contact_phone }}
+                </div>
+            </div>
+
+            <div style="display: flex; gap: var(--space-md); margin-top: var(--space-xl);">
+                <button type="submit" class="btn btn-primary">
+                    {% if tenant %}Save Changes{% else %}Add Tenant{% endif %}
+                </button>
+                <a href="{% url 'tenants:list' %}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

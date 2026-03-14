@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}{{ property.name }}{% endblock %}
+{% block page_title %}{{ property.name }}{% endblock %}
+{% block page_subtitle %}{{ property.address }}{% endblock %}
+
+{% block page_actions %}
+<div style="display: flex; gap: var(--space-sm);">
+    <a href="{% url 'tenants:create' %}?property={{ property.pk }}" class="btn btn-primary">+ Add Tenant</a>
+    <a href="{% url 'properties:update' pk=property.pk %}" class="btn btn-secondary">✏️ Edit</a>
+    <a href="{% url 'properties:delete' pk=property.pk %}" class="btn btn-danger btn-sm">🗑️</a>
+</div>
+{% endblock %}
+
+{% block content %}
+<!-- Property Stats -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon primary">🏠</div>
+        <div class="stat-value">{{ property.total_units }}</div>
+        <div class="stat-label">Total Units</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon success">✅</div>
+        <div class="stat-value">{{ property.occupied_units }}</div>
+        <div class="stat-label">Occupied</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon danger">🔑</div>
+        <div class="stat-value">{{ property.vacant_units }}</div>
+        <div class="stat-label">Vacant</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon accent">📊</div>
+        <div class="stat-value">{{ property.occupancy_rate }}%</div>
+        <div class="stat-label">Occupancy Rate</div>
+        <div class="progress-bar" style="margin-top: 0.5rem;">
+            <div class="progress-fill" style="width: {{ property.occupancy_rate }}%"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Property Info -->
+<div class="detail-info-grid">
+    <div class="detail-info-item">
+        <div class="detail-info-label">Property Type</div>
+        <div class="detail-info-value">{{ property.get_property_type_display }}</div>
+    </div>
+    <div class="detail-info-item">
+        <div class="detail-info-label">Status</div>
+        <div class="detail-info-value">
+            <span class="badge {% if property.status == 'active' %}badge-success{% elif property.status == 'maintenance' %}badge-warning{% else %}badge-gray{% endif %}">
+                {{ property.get_status_display }}
+            </span>
+        </div>
+    </div>
+    <div class="detail-info-item">
+        <div class="detail-info-label">Location</div>
+        <div class="detail-info-value">{{ property.city }}, {{ property.state }}</div>
+    </div>
+    <div class="detail-info-item">
+        <div class="detail-info-label">Landlord</div>
+        <div class="detail-info-value">{{ property.landlord_name|default:"Not set" }}</div>
+    </div>
+    <div class="detail-info-item">
+        <div class="detail-info-label">Landlord Phone</div>
+        <div class="detail-info-value">{{ property.landlord_phone|default:"Not set" }}</div>
+    </div>
+    <div class="detail-info-item">
+        <div class="detail-info-label">Monthly Revenue</div>
+        <div class="detail-info-value">₦{{ property.total_monthly_revenue|intcomma }}</div>
+    </div>
+</div>
+
+<!-- Tenants Table -->
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Tenants ({{ active_tenants }})</h3>
+        <a href="{% url 'tenants:create' %}?property={{ property.pk }}" class="btn btn-sm btn-primary">+ Add Tenant</a>
+    </div>
+    {% if tenants %}
+    <div class="table-container" style="border: none; border-radius: 0;">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Tenant</th>
+                    <th>Flat/Room</th>
+                    <th>Phone</th>
+                    <th>Rent (₦)</th>
+                    <th>Total Due (₦)</th>
+                    <th>Paid (₦)</th>
+                    <th>Balance (₦)</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tenant in tenants %}
+                <tr>
+                    <td><a href="{% url 'tenants:detail' pk=tenant.pk %}"><strong>{{ tenant.name }}</strong></a></td>
+                    <td>{{ tenant.flat_or_room }}</td>
+                    <td>{{ tenant.phone|default:"-" }}</td>
+                    <td>₦{{ tenant.rent_amount|intcomma }}</td>
+                    <td>₦{{ tenant.total_due|intcomma }}</td>
+                    <td class="text-success">₦{{ tenant.total_paid|intcomma }}</td>
+                    <td>
+                        {% if tenant.balance > 0 %}
+                            <span class="text-danger font-bold">₦{{ tenant.balance|intcomma }}</span>
+                        {% else %}
+                            <span class="badge badge-success">Paid</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if tenant.is_active %}
+                            <span class="badge badge-success">Active</span>
+                        {% else %}
+                            <span class="badge badge-gray">Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div style="display: flex; gap: 4px;">
+                            <a href="{% url 'payments:create' %}?tenant={{ tenant.pk }}" class="btn btn-sm btn-success">💰</a>
+                            <a href="{% url 'tenants:update' pk=tenant.pk %}" class="btn btn-sm btn-secondary">✏️</a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="card-body">
+        <div class="empty-state">
+            <div class="empty-state-icon">👥</div>
+            <h3>No tenants yet</h3>
+            <p>Add tenants to this property to start tracking rent and payments.</p>
+            <a href="{% url 'tenants:create' %}?property={{ property.pk }}" class="btn btn-primary">+ Add First Tenant</a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

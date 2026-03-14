@@ -1,0 +1,79 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accept Invitation | TenancyFlow</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body class="auth-page">
+    <div class="auth-card" style="max-width: 600px;">
+        <div class="auth-header">
+            <div class="auth-logo">🏠</div>
+            <h1 class="auth-title">Welcome to TenancyFlow!</h1>
+            <p class="auth-subtitle">
+                You've been invited by <strong>{{ invite.invited_by.get_full_name|default:invite.invited_by.username }}</strong> 
+                to set up your advanced property management account.
+            </p>
+        </div>
+        
+        <div class="auth-body">
+            <!-- Read-only locked info from the invite -->
+            <div style="background: var(--gray-100); padding: var(--space-md); border-radius: var(--radius-md); margin-bottom: var(--space-lg); border-left: 4px solid var(--primary-color);">
+                <div style="margin-bottom: var(--space-sm);">
+                    <strong style="color: var(--gray-600); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">Registered Email</strong>
+                    <div style="font-weight: 500; color: var(--gray-800);">{{ invite.email }}</div>
+                </div>
+                {% if invite.company_name %}
+                <div>
+                    <strong style="color: var(--gray-600); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">Company Name</strong>
+                    <div style="font-weight: 500; color: var(--gray-800);">{{ invite.company_name }}</div>
+                </div>
+                {% endif %}
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+                
+                <h3 style="font-size: 1.1rem; margin-bottom: var(--space-md); color: var(--gray-800);">Complete your profile securely:</h3>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        {{ form.first_name }}
+                        {% if form.first_name.errors %}<p class="form-error">{{ form.first_name.errors.0 }}</p>{% endif %}
+                    </div>
+                    <div class="form-group">
+                        {{ form.last_name }}
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        {{ form.username }}
+                        {% if form.username.errors %}<p class="form-error">{{ form.username.errors.0 }}</p>{% endif %}
+                    </div>
+                    <div class="form-group">
+                        {{ form.phone }}
+                        {% if form.phone.errors %}<p class="form-error">{{ form.phone.errors.0 }}</p>{% endif %}
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        {{ form.password1 }}
+                        {% if form.password1.errors %}<p class="form-error">{{ form.password1.errors.0 }}</p>{% endif %}
+                    </div>
+                    <div class="form-group">
+                        {{ form.password2 }}
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block" style="margin-top: var(--space-lg);">
+                    Complete Setup & Access Dashboard 🚀
+                </button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

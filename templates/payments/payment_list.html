@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Payments{% endblock %}
+{% block page_title %}Payments{% endblock %}
+{% block page_subtitle %}{{ total_payments }} payment{{ total_payments|pluralize }} recorded{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'payments:create' %}" class="btn btn-primary">+ Record Payment</a>
+{% endblock %}
+
+{% block content %}
+<!-- Total Summary -->
+<div class="stats-grid" style="margin-bottom: var(--space-xl);">
+    <div class="stat-card success">
+        <div class="stat-icon success">💰</div>
+        <div class="stat-value">₦{{ total_collected|intcomma }}</div>
+        <div class="stat-label">Total Collected (Confirmed)</div>
+    </div>
+</div>
+
+<form method="get" class="filter-bar">
+    <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" name="search" value="{{ search }}" placeholder="Search by tenant, reference..." class="form-input">
+    </div>
+    <select name="method" class="filter-select" onchange="this.form.submit()">
+        <option value="">All Methods</option>
+        <option value="cash" {% if method_filter == 'cash' %}selected{% endif %}>Cash</option>
+        <option value="transfer" {% if method_filter == 'transfer' %}selected{% endif %}>Bank Transfer</option>
+        <option value="cheque" {% if method_filter == 'cheque' %}selected{% endif %}>Cheque</option>
+        <option value="pos" {% if method_filter == 'pos' %}selected{% endif %}>POS</option>
+        <option value="online" {% if method_filter == 'online' %}selected{% endif %}>Online</option>
+    </select>
+    <select name="status" class="filter-select" onchange="this.form.submit()">
+        <option value="">All Status</option>
+        <option value="confirmed" {% if status_filter == 'confirmed' %}selected{% endif %}>Confirmed</option>
+        <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
+        <option value="cancelled" {% if status_filter == 'cancelled' %}selected{% endif %}>Cancelled</option>
+    </select>
+    <button type="submit" class="btn btn-secondary">Search</button>
+</form>
+
+{% if payments %}
+<div class="table-container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Tenant</th>
+                <th>Property</th>
+                <th>Amount</th>
+                <th>Date</th>
+                <th>Method</th>
+                <th>Reference</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for payment in payments %}
+            <tr>
+                <td>
+                    <a href="{% url 'tenants:detail' pk=payment.tenant.pk %}"><strong>{{ payment.tenant.name }}</strong></a>
+                </td>
+                <td>{{ payment.tenant.building.name }}</td>
+                <td><strong>₦{{ payment.amount|intcomma }}</strong></td>
+                <td>{{ payment.payment_date|date:"M d, Y" }}</td>
+                <td>{{ payment.get_payment_method_display }}</td>
+                <td>{{ payment.reference|default:"-" }}</td>
+                <td>
+                    <span class="badge {% if payment.status == 'confirmed' %}badge-success{% elif payment.status == 'pending' %}badge-warning{% else %}badge-danger{% endif %}">
+                        {{ payment.get_status_display }}
+                    </span>
+                </td>
+                <td>
+                    <a href="{% url 'payments:delete' pk=payment.pk %}" class="btn btn-sm btn-secondary">🗑️</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="card">
+    <div class="empty-state">
+        <div class="empty-state-icon">💳</div>
+        <h3>No payments found</h3>
+        <p>{% if search or method_filter or status_filter %}Try adjusting your filters.{% else %}Record your first payment to start tracking.{% endif %}</p>
+        <a href="{% url 'payments:create' %}" class="btn btn-primary">+ Record Payment</a>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

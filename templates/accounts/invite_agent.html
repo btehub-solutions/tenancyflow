@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}Invite New Agent{% endblock %}
+{% block page_title %}Invite New Agent{% endblock %}
+{% block page_subtitle %}Send secure registration links to new clients{% endblock %}
+
+{% block content %}
+<div style="display: grid; grid-template-columns: 1fr 2fr; gap: var(--space-xl);">
+    
+    <!-- Invite Form -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Send Invitation</h3>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label class="form-label">Client Email *</label>
+                    {{ form.email }}
+                    {% if form.email.errors %}<p class="form-error">{{ form.email.errors.0 }}</p>{% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Company / Agency Name</label>
+                    {{ form.company_name }}
+                    <span class="text-muted" style="font-size: 0.8rem; margin-top: 4px; display: block;">This will be pre-filled for them when they sign up.</span>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: var(--space-md);">
+                    ✉️ Send Secure Invite Link
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Invitation History -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Invitation History</h3>
+        </div>
+        {% if invitations %}
+        <div class="table-container" style="border: none; border-radius: 0;">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Email</th>
+                        <th>Company</th>
+                        <th>Sent</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for invite in invitations %}
+                    <tr>
+                        <td><strong>{{ invite.email }}</strong></td>
+                        <td>{{ invite.company_name|default:"-" }}</td>
+                        <td>{{ invite.created_at|date:"M d, Y" }}</td>
+                        <td>
+                            {% if invite.is_accepted %}
+                                <span class="badge badge-success">Accepted</span>
+                            {% elif invite.is_expired %}
+                                <span class="badge badge-danger">Expired</span>
+                            {% else %}
+                                <span class="badge badge-warning">Pending</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="card-body">
+            <div class="empty-state">
+                <div class="empty-state-icon">💌</div>
+                <h3>No invites sent yet</h3>
+                <p>Use the form on the left to invite your first client to TenancyFlow.</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

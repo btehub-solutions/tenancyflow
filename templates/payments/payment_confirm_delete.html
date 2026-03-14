@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Delete Payment{% endblock %}
+{% block page_title %}Delete Payment{% endblock %}
+
+{% block content %}
+<div class="card confirm-card">
+    <div class="card-body" style="padding: var(--space-2xl);">
+        <div class="confirm-icon">⚠️</div>
+        <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: var(--space-sm);">Delete this payment?</h3>
+        <p class="text-muted">
+            Payment of <strong>₦{{ payment.amount|intcomma }}</strong> from <strong>{{ payment.tenant.name }}</strong> 
+            on {{ payment.payment_date|date:"M d, Y" }}. This action cannot be undone.
+        </p>
+        <div class="confirm-actions">
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Yes, Delete Payment</button>
+            </form>
+            <a href="{% url 'payments:list' %}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
