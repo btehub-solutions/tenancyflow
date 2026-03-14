@@ -76,8 +76,10 @@ WSGI_APPLICATION = 'tenancyflow.wsgi.application'
 import dj_database_url
 
 # Database - SQLite for development, switch to PostgreSQL for production
+# Vercel integration provides POSTGRES_URL instead of DATABASE_URL
+database_url = env('DATABASE_URL', default=env('POSTGRES_URL', default=f'sqlite:///{BASE_DIR / "db.sqlite3"}'))
 DATABASES = {
-    'default': env.db('DATABASE_URL', default=f'sqlite:///{BASE_DIR / "db.sqlite3"}')
+    'default': dj_database_url.parse(database_url, conn_max_age=600, conn_health_checks=True)
 }
 
 
