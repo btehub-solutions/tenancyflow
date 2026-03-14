@@ -55,10 +55,8 @@
             {% endif %}
             
             <div class="absolute top-6 left-6">
-                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-md text-[10px] font-black uppercase tracking-widest
-                    {% if property.status == 'active' %}text-emerald-500{% elif property.status == 'maintenance' %}text-amber-500{% else %}text-slate-500{% endif %}">
-                    <div class="w-1.5 h-1.5 rounded-full animate-pulse
-                        {% if property.status == 'active' %}bg-emerald-500{% elif property.status == 'maintenance' %}bg-amber-500{% else %}bg-slate-500{% endif %}"></div>
+                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-md text-[10px] font-black uppercase tracking-widest {% if property.status == 'active' %}text-emerald-500{% elif property.status == 'maintenance' %}text-amber-500{% else %}text-slate-500{% endif %}">
+                    <div class="w-1.5 h-1.5 rounded-full animate-pulse {% if property.status == 'active' %}bg-emerald-500{% elif property.status == 'maintenance' %}bg-amber-500{% else %}bg-slate-500{% endif %}"></div>
                     {{ property.get_status_display }}
                 </span>
             </div>
