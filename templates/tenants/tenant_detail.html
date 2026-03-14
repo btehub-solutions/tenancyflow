@@ -2,175 +2,192 @@
 {% load humanize %}
 
 {% block title %}{{ tenant.name }}{% endblock %}
-{% block page_title %}{{ tenant.name }}{% endblock %}
-{% block page_subtitle %}{{ tenant.flat_or_room }} at {{ tenant.building.name }}{% endblock %}
+{% block page_title %}Tenant Dossier{% endblock %}
+{% block page_subtitle %}In-depth professional profile and financial analysis for {{ tenant.name }}.{% endblock %}
 
 {% block page_actions %}
-<div style="display: flex; gap: var(--space-sm);">
-    <a href="{% url 'payments:create' %}?tenant={{ tenant.pk }}" class="btn btn-success">💰 Record Payment</a>
-    <a href="{% url 'tenants:update' pk=tenant.pk %}" class="btn btn-secondary">✏️ Edit</a>
-    <a href="{% url 'tenants:delete' pk=tenant.pk %}" class="btn btn-danger btn-sm">🗑️</a>
+<div class="flex items-center gap-3">
+    <a href="{% url 'payments:create' %}?tenant={{ tenant.pk }}" class="flex items-center gap-2 px-6 py-2.5 rounded-2xl bg-teal-500 text-white font-bold shadow-lg shadow-teal-500/20 hover:scale-105 transition-all">
+        <i data-lucide="banknote" class="w-5 h-5"></i>
+        <span>Record Payment</span>
+    </a>
+    <a href="{% url 'tenants:update' pk=tenant.pk %}" class="p-2.5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-indigo-500 transition-all">
+        <i data-lucide="edit-3" class="w-5 h-5"></i>
+    </a>
+    <a href="{% url 'tenants:delete' pk=tenant.pk %}" class="p-2.5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-red-500 transition-all">
+        <i data-lucide="trash-2" class="w-5 h-5"></i>
+    </a>
 </div>
 {% endblock %}
 
 {% block content %}
-<!-- Financial Summary Stats -->
-<div class="stats-grid">
-    <div class="stat-card">
-        <div class="stat-icon accent">💵</div>
-        <div class="stat-value">₦{{ tenant.rent_amount|intcomma }}</div>
-        <div class="stat-label">Rent Amount</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-icon info">📋</div>
-        <div class="stat-value">₦{{ tenant.total_due|intcomma }}</div>
-        <div class="stat-label">Total Due</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-icon success">✅</div>
-        <div class="stat-value">₦{{ tenant.total_paid|intcomma }}</div>
-        <div class="stat-label">Total Paid</div>
-    </div>
-    <div class="stat-card {% if tenant.balance > 0 %}danger{% endif %}">
-        <div class="stat-icon {% if tenant.balance > 0 %}danger{% else %}success{% endif %}">
-            {% if tenant.balance > 0 %}⚠️{% else %}🎉{% endif %}
+<div class="space-y-8 animate-slide-up">
+    <!-- Financial Pulse Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div class="glass-card p-6 rounded-[2rem]">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-teal-500/10 text-teal-600 flex items-center justify-center">
+                    <i data-lucide="hash" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Base Rent</p>
+                    <h3 class="text-xl font-black text-slate-900 dark:text-white">₦{{ tenant.rent_amount|intcomma }}</h3>
+                </div>
+            </div>
         </div>
-        <div class="stat-value">₦{{ tenant.balance|intcomma }}</div>
-        <div class="stat-label">Outstanding Balance</div>
+        <div class="glass-card p-6 rounded-[2rem]">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-600 flex items-center justify-center">
+                    <i data-lucide="file-text" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total Liability</p>
+                    <h3 class="text-xl font-black text-slate-900 dark:text-white">₦{{ tenant.total_due|intcomma }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="glass-card p-6 rounded-[2rem]">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center">
+                    <i data-lucide="check-circle" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Settled Assets</p>
+                    <h3 class="text-xl font-black text-slate-900 dark:text-white">₦{{ tenant.total_paid|intcomma }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="glass-card p-6 rounded-[2rem] {% if tenant.balance > 0 %}border-orange-500/20 bg-orange-500/5{% endif %}">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-2xl {% if tenant.balance > 0 %}bg-orange-500/10 text-orange-600{% else %}bg-emerald-500/10 text-emerald-600{% endif %} flex items-center justify-center">
+                    <i data-lucide="{% if tenant.balance > 0 %}alert-triangle{% else %}award{% endif %}" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Balance Ledger</p>
+                    <h3 class="text-xl font-black text-slate-900 dark:text-white">₦{{ tenant.balance|intcomma }}</h3>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
 
-<!-- Tenant Details -->
-<div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-xl);">
-    <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">Personal Details</h3>
-        </div>
-        <div class="card-body">
-            <div class="detail-info-grid" style="grid-template-columns: 1fr;">
-                <div class="detail-info-item">
-                    <div class="detail-info-label">Full Name</div>
-                    <div class="detail-info-value">{{ tenant.name }}</div>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Profile Column -->
+        <div class="lg:col-span-1 space-y-8">
+            <div class="glass-card rounded-[2.5rem] p-8 text-center">
+                <div class="w-32 h-32 rounded-4xl bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 flex items-center justify-center mx-auto mb-6 text-4xl font-black text-slate-400 shadow-xl border-4 border-white dark:border-slate-800">
+                    {{ tenant.name|make_list|first|upper }}
                 </div>
-                <div class="detail-info-item">
-                    <div class="detail-info-label">Phone</div>
-                    <div class="detail-info-value">{{ tenant.phone|default:"Not provided" }}</div>
-                </div>
-                <div class="detail-info-item">
-                    <div class="detail-info-label">Email</div>
-                    <div class="detail-info-value">{{ tenant.email|default:"Not provided" }}</div>
-                </div>
-                <div class="detail-info-item">
-                    <div class="detail-info-label">Status</div>
-                    <div class="detail-info-value">
-                        {% if tenant.is_active %}
-                            <span class="badge badge-success">Active</span>
-                        {% else %}
-                            <span class="badge badge-gray">Inactive</span>
-                        {% endif %}
+                <h3 class="text-2xl font-bold text-slate-900 dark:text-white mb-2">{{ tenant.name }}</h3>
+                <span class="inline-flex px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-500 text-[10px] font-black uppercase tracking-widest border border-emerald-500/20 mb-8">
+                    {{ tenant.get_is_active_display|default:"Active Status" }}
+                </span>
+                
+                <div class="space-y-4 text-left border-t border-slate-100 dark:border-slate-800 pt-8">
+                    <div class="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/50">
+                        <i data-lucide="phone" class="w-5 h-5 text-slate-400"></i>
+                        <div>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Phone Connection</p>
+                            <p class="text-sm font-bold text-slate-900 dark:text-white">{{ tenant.phone|default:"Not established" }}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/50">
+                        <i data-lucide="mail" class="w-5 h-5 text-slate-400"></i>
+                        <div>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Digital Mail</p>
+                            <p class="text-sm font-bold text-slate-900 dark:text-white">{{ tenant.email|default:"Not established" }}</p>
+                        </div>
                     </div>
                 </div>
-                {% if tenant.emergency_contact_name %}
-                <div class="detail-info-item">
-                    <div class="detail-info-label">Emergency Contact</div>
-                    <div class="detail-info-value">{{ tenant.emergency_contact_name }} ({{ tenant.emergency_contact_phone }})</div>
+            </div>
+
+            {% if tenant.emergency_contact_name %}
+            <div class="glass-card rounded-3xl p-6">
+                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                    <i data-lucide="shield" class="w-3.5 h-3.5"></i>
+                    Emergency Contact
+                </h4>
+                <p class="text-sm font-bold text-slate-900 dark:text-white mb-1">{{ tenant.emergency_contact_name }}</p>
+                <p class="text-xs text-slate-500">{{ tenant.emergency_contact_phone }}</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Tenancy Details Column -->
+        <div class="lg:col-span-2 space-y-8">
+            <div class="glass-card rounded-[2.5rem] overflow-hidden">
+                <div class="p-8 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white">Lease Parameters</h3>
+                    <div class="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs font-bold text-slate-600 dark:text-slate-400">
+                        <i data-lucide="briefcase" class="w-4 h-4"></i>
+                        {{ tenant.building.name }}
+                    </div>
                 </div>
-                {% endif %}
-                {% if tenant.remarks %}
-                <div class="detail-info-item">
-                    <div class="detail-info-label">Remarks</div>
-                    <div class="detail-info-value">{{ tenant.remarks }}</div>
+                <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="space-y-1">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Assigned Unit</p>
+                        <p class="text-lg font-bold text-slate-900 dark:text-white">{{ tenant.flat_or_room }}</p>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Lease Horizon</p>
+                        <p class="text-lg font-bold text-slate-900 dark:text-white">
+                            {% if tenant.tenancy_start %}{{ tenant.tenancy_start|date:"M d, Y" }}{% else %}Start Pend.{% endif %} 
+                            — 
+                            {% if tenant.tenancy_end %}{{ tenant.tenancy_end|date:"M d, Y" }}{% else %}End Pend.{% endif %}
+                        </p>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Agreement Liquidity</p>
+                        <p class="text-lg font-bold text-slate-900 dark:text-white">₦{{ tenant.agreement_fee|intcomma }}</p>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Caution Reserves</p>
+                        <p class="text-lg font-bold text-slate-900 dark:text-white">₦{{ tenant.caution_fee|intcomma }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment History -->
+            <div class="glass-card rounded-[2.5rem] overflow-hidden">
+                <div class="p-8 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white">Transaction History</h3>
+                </div>
+                {% if payments %}
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="bg-slate-50/50 dark:bg-slate-800/30">
+                                <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Execution Date</th>
+                                <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Magnitude</th>
+                                <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center">Status</th>
+                                <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Channel</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                            {% for payment in payments %}
+                            <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors">
+                                <td class="px-6 py-4 text-sm font-bold text-slate-700 dark:text-slate-300">{{ payment.payment_date|date:"M d, Y" }}</td>
+                                <td class="px-6 py-4 text-sm font-black text-right dark:text-white">₦{{ payment.amount|intcomma }}</td>
+                                <td class="px-6 py-4 text-center">
+                                    <span class="inline-flex px-2 py-0.5 rounded-full {% if payment.status == 'confirmed' %}bg-emerald-500/10 text-emerald-500{% elif payment.status == 'pending' %}bg-amber-500/10 text-amber-500{% else %}bg-red-500/10 text-red-500{% endif %} text-[10px] font-bold uppercase tracking-widest">
+                                        {{ payment.status }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 text-sm text-slate-500 font-medium">{{ payment.get_payment_method_display }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="p-12 text-center">
+                    <div class="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-4 text-slate-400">
+                        <i data-lucide="receipt" class="w-8 h-8"></i>
+                    </div>
+                    <p class="text-slate-500 font-medium">No transactional data recorded yet.</p>
                 </div>
                 {% endif %}
             </div>
         </div>
     </div>
-
-    <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">Tenancy & Financial</h3>
-        </div>
-        <div class="card-body">
-            <div class="detail-info-grid" style="grid-template-columns: 1fr;">
-                <div class="detail-info-item">
-                    <div class="detail-info-label">Property</div>
-                    <div class="detail-info-value">
-                        <a href="{% url 'properties:detail' pk=tenant.building.pk %}">{{ tenant.building.name }}</a>
-                    </div>
-                </div>
-                <div class="detail-info-item">
-                    <div class="detail-info-label">Flat / Room</div>
-                    <div class="detail-info-value">{{ tenant.flat_or_room }}</div>
-                </div>
-                <div class="detail-info-item">
-                    <div class="detail-info-label">Agreement Fee</div>
-                    <div class="detail-info-value">₦{{ tenant.agreement_fee|intcomma }}</div>
-                </div>
-                <div class="detail-info-item">
-                    <div class="detail-info-label">Caution Fee</div>
-                    <div class="detail-info-value">₦{{ tenant.caution_fee|intcomma }}</div>
-                </div>
-                <div class="detail-info-item">
-                    <div class="detail-info-label">Tenancy Period</div>
-                    <div class="detail-info-value">
-                        {% if tenant.tenancy_start and tenant.tenancy_end %}
-                            {{ tenant.tenancy_start|date:"M d, Y" }} — {{ tenant.tenancy_end|date:"M d, Y" }}
-                        {% else %}
-                            Not set
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Payment History -->
-<div class="card" style="margin-top: var(--space-xl);">
-    <div class="card-header">
-        <h3 class="card-title">Payment History</h3>
-        <a href="{% url 'payments:create' %}?tenant={{ tenant.pk }}" class="btn btn-sm btn-success">+ Record Payment</a>
-    </div>
-    {% if payments %}
-    <div class="table-container" style="border: none; border-radius: 0;">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Amount</th>
-                    <th>Method</th>
-                    <th>Reference</th>
-                    <th>Status</th>
-                    <th>Recorded By</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for payment in payments %}
-                <tr>
-                    <td>{{ payment.payment_date|date:"M d, Y" }}</td>
-                    <td><strong>₦{{ payment.amount|intcomma }}</strong></td>
-                    <td>{{ payment.get_payment_method_display }}</td>
-                    <td>{{ payment.reference|default:"-" }}</td>
-                    <td>
-                        <span class="badge {% if payment.status == 'confirmed' %}badge-success{% elif payment.status == 'pending' %}badge-warning{% else %}badge-danger{% endif %}">
-                            {{ payment.get_status_display }}
-                        </span>
-                    </td>
-                    <td>{{ payment.recorded_by|default:"-" }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    {% else %}
-    <div class="card-body">
-        <div class="empty-state">
-            <div class="empty-state-icon">💳</div>
-            <h3>No payments recorded</h3>
-            <p>Record the first payment for this tenant.</p>
-            <a href="{% url 'payments:create' %}?tenant={{ tenant.pk }}" class="btn btn-success">💰 Record Payment</a>
-        </div>
-    </div>
-    {% endif %}
 </div>
 {% endblock %}
