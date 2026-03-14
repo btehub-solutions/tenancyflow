@@ -25,14 +25,6 @@ DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['127.0.0.1', 'localhost', '*'])
 
-# CSRF Trusted Origins for Vercel deployment
-CSRF_TRUSTED_ORIGINS = ['https://tenancyflow.vercel.app']
-
-# Security settings for deployment behind reverse proxy (Vercel)
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-USE_X_FORWARDED_HOST = True
-USE_X_FORWARDED_PORT = True
-
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',

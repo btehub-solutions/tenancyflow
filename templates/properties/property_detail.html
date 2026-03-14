@@ -2,168 +2,142 @@
 {% load humanize %}
 
 {% block title %}{{ property.name }}{% endblock %}
-{% block page_title %}Property Intelligence{% endblock %}
-{% block page_subtitle %}{{ property.address }} — Asset Analytics & Stakeholder Overview{% endblock %}
+{% block page_title %}{{ property.name }}{% endblock %}
+{% block page_subtitle %}{{ property.address }}{% endblock %}
 
 {% block page_actions %}
-<div class="flex items-center gap-3">
-    <a href="{% url 'tenants:create' %}?property={{ property.pk }}" class="flex items-center gap-2 px-6 py-2.5 rounded-2xl bg-teal-500 text-white font-bold shadow-lg shadow-teal-500/20 hover:scale-105 transition-all">
-        <i data-lucide="user-plus" class="w-5 h-5"></i>
-        <span>Add Tenant</span>
-    </a>
-    <a href="{% url 'properties:update' pk=property.pk %}" class="p-2.5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-indigo-500 transition-all">
-        <i data-lucide="edit-3" class="w-5 h-5"></i>
-    </a>
-    <a href="{% url 'properties:delete' pk=property.pk %}" class="p-2.5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-red-500 transition-all">
-        <i data-lucide="trash-2" class="w-5 h-5"></i>
-    </a>
+<div style="display: flex; gap: var(--space-sm);">
+    <a href="{% url 'tenants:create' %}?property={{ property.pk }}" class="btn btn-primary">+ Add Tenant</a>
+    <a href="{% url 'properties:update' pk=property.pk %}" class="btn btn-secondary">✏️ Edit</a>
+    <a href="{% url 'properties:delete' pk=property.pk %}" class="btn btn-danger btn-sm">🗑️</a>
 </div>
 {% endblock %}
 
 {% block content %}
-<div class="space-y-8 animate-slide-up">
-    <!-- Asset Capacity Stats -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div class="glass-card p-6 rounded-[2rem]">
-            <div class="flex items-center gap-4">
-                <div class="w-12 h-12 rounded-2xl bg-teal-500/10 text-teal-600 flex items-center justify-center">
-                    <i data-lucide="layers" class="w-6 h-6"></i>
-                </div>
-                <div>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total Capacity</p>
-                    <h3 class="text-xl font-black text-slate-900 dark:text-white">{{ property.total_units }} Units</h3>
-                </div>
-            </div>
-        </div>
-        <div class="glass-card p-6 rounded-[2rem]">
-            <div class="flex items-center gap-4">
-                <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center">
-                    <i data-lucide="user-check" class="w-6 h-6"></i>
-                </div>
-                <div>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Occupancy</p>
-                    <h3 class="text-xl font-black text-slate-900 dark:text-white">{{ property.occupied_units }} Active</h3>
-                </div>
-            </div>
-        </div>
-        <div class="glass-card p-6 rounded-[2rem]">
-            <div class="flex items-center gap-4">
-                <div class="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-600 flex items-center justify-center">
-                    <i data-lucide="key" class="w-6 h-6"></i>
-                </div>
-                <div>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Available</p>
-                    <h3 class="text-xl font-black text-slate-900 dark:text-white">{{ property.vacant_units }} Vacant</h3>
-                </div>
-            </div>
-        </div>
-        <div class="glass-card p-6 rounded-[2rem]">
-            <div class="flex items-center gap-4">
-                <div class="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-600 flex items-center justify-center">
-                    <i data-lucide="pie-chart" class="w-6 h-6"></i>
-                </div>
-                <div class="flex-1">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Saturation</p>
-                    <h3 class="text-xl font-black text-slate-900 dark:text-white">{{ property.occupancy_rate }}%</h3>
-                </div>
-            </div>
+<!-- Property Stats -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon primary">🏠</div>
+        <div class="stat-value">{{ property.total_units }}</div>
+        <div class="stat-label">Total Units</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon success">✅</div>
+        <div class="stat-value">{{ property.occupied_units }}</div>
+        <div class="stat-label">Occupied</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon danger">🔑</div>
+        <div class="stat-value">{{ property.vacant_units }}</div>
+        <div class="stat-label">Vacant</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon accent">📊</div>
+        <div class="stat-value">{{ property.occupancy_rate }}%</div>
+        <div class="stat-label">Occupancy Rate</div>
+        <div class="progress-bar" style="margin-top: 0.5rem;">
+            <div class="progress-fill" style="width: {{ property.occupancy_rate }}%"></div>
         </div>
     </div>
+</div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Technical Specifications -->
-        <div class="lg:col-span-1 space-y-8">
-            <div class="glass-card rounded-[2.5rem] p-8">
-                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-2">
-                    <i data-lucide="settings" class="w-3.5 h-3.5"></i>
-                    Asset Specifications
-                </h4>
-                <div class="space-y-6">
-                    <div class="flex items-center justify-between py-3 border-b border-slate-100 dark:border-slate-800">
-                        <span class="text-sm text-slate-500">Asset Type</span>
-                        <span class="text-sm font-bold text-slate-900 dark:text-white">{{ property.get_property_type_display }}</span>
-                    </div>
-                    <div class="flex items-center justify-between py-3 border-b border-slate-100 dark:border-slate-800">
-                        <span class="text-sm text-slate-500">Operation Status</span>
-                        <span class="inline-flex px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 text-[10px] font-black uppercase tracking-widest">{{ property.get_status_display }}</span>
-                    </div>
-                    <div class="flex items-center justify-between py-3 border-b border-slate-100 dark:border-slate-800">
-                        <span class="text-sm text-slate-500">Yield / Month</span>
-                        <span class="text-sm font-black text-teal-500">₦{{ property.total_monthly_revenue|intcomma }}</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="glass-card rounded-3xl p-8 bg-slate-900 dark:bg-slate-900 dark:border-slate-800">
-                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">Ownership Cluster</h4>
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-white">
-                        <i data-lucide="user" class="w-6 h-6"></i>
-                    </div>
-                    <div>
-                        <p class="text-[10px] font-bold text-slate-500 uppercase">Landlord / Owner</p>
-                        <p class="text-sm font-bold text-white">{{ property.landlord_name|default:"Corporate Entity" }}</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Stakeholder Index -->
-        <div class="lg:col-span-2">
-            <div class="glass-card rounded-[2.5rem] overflow-hidden">
-                <div class="p-8 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                    <h3 class="text-xl font-bold text-slate-900 dark:text-white">Active Resident Network</h3>
-                    <span class="text-xs font-bold text-slate-400">{{ active_tenants }} Verified Occupants</span>
-                </div>
-                {% if tenants %}
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left">
-                        <thead>
-                            <tr class="bg-slate-50/50 dark:bg-slate-800/30">
-                                <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Inhabitant</th>
-                                <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Unit ID</th>
-                                <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Balance</th>
-                                <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
-                            {% for tenant in tenants %}
-                            <tr class="hover:bg-slate-50/10 dark:hover:bg-slate-800/10 transition-colors group">
-                                <td class="px-6 py-4">
-                                    <p class="text-sm font-bold text-slate-900 dark:text-white">{{ tenant.name }}</p>
-                                    <p class="text-[10px] text-slate-500">{{ tenant.phone|default:"Unlisted" }}</p>
-                                </td>
-                                <td class="px-6 py-4 text-sm font-medium text-slate-600 dark:text-slate-400">{{ tenant.flat_or_room }}</td>
-                                <td class="px-6 py-4 text-right">
-                                    {% if tenant.balance > 0 %}
-                                        <span class="text-sm font-black text-orange-500">₦{{ tenant.balance|intcomma }}</span>
-                                    {% else %}
-                                        <span class="text-[10px] font-black text-emerald-500 uppercase">Settled</span>
-                                    {% endif %}
-                                </td>
-                                <td class="px-6 py-4 text-right">
-                                    <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <a href="{% url 'tenants:detail' pk=tenant.pk %}" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-teal-500">
-                                            <i data-lucide="external-link" class="w-4 h-4"></i>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                {% else %}
-                <div class="p-20 text-center">
-                    <div class="w-20 h-20 bg-slate-50 dark:bg-slate-900 rounded-3xl flex items-center justify-center mx-auto mb-6 text-slate-300">
-                        <i data-lucide="users" class="w-10 h-10"></i>
-                    </div>
-                    <p class="text-slate-500 text-lg mb-8">No inhabitants registered for this asset location.</p>
-                    <a href="{% url 'tenants:create' %}?property={{ property.pk }}" class="inline-flex px-8 py-3 rounded-2xl bg-teal-500 text-white font-bold">Initiate Onboarding</a>
-                </div>
-                {% endif %}
-            </div>
+<!-- Property Info -->
+<div class="detail-info-grid">
+    <div class="detail-info-item">
+        <div class="detail-info-label">Property Type</div>
+        <div class="detail-info-value">{{ property.get_property_type_display }}</div>
+    </div>
+    <div class="detail-info-item">
+        <div class="detail-info-label">Status</div>
+        <div class="detail-info-value">
+            <span class="badge {% if property.status == 'active' %}badge-success{% elif property.status == 'maintenance' %}badge-warning{% else %}badge-gray{% endif %}">
+                {{ property.get_status_display }}
+            </span>
         </div>
     </div>
+    <div class="detail-info-item">
+        <div class="detail-info-label">Location</div>
+        <div class="detail-info-value">{{ property.city }}, {{ property.state }}</div>
+    </div>
+    <div class="detail-info-item">
+        <div class="detail-info-label">Landlord</div>
+        <div class="detail-info-value">{{ property.landlord_name|default:"Not set" }}</div>
+    </div>
+    <div class="detail-info-item">
+        <div class="detail-info-label">Landlord Phone</div>
+        <div class="detail-info-value">{{ property.landlord_phone|default:"Not set" }}</div>
+    </div>
+    <div class="detail-info-item">
+        <div class="detail-info-label">Monthly Revenue</div>
+        <div class="detail-info-value">₦{{ property.total_monthly_revenue|intcomma }}</div>
+    </div>
+</div>
+
+<!-- Tenants Table -->
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Tenants ({{ active_tenants }})</h3>
+        <a href="{% url 'tenants:create' %}?property={{ property.pk }}" class="btn btn-sm btn-primary">+ Add Tenant</a>
+    </div>
+    {% if tenants %}
+    <div class="table-container" style="border: none; border-radius: 0;">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Tenant</th>
+                    <th>Flat/Room</th>
+                    <th>Phone</th>
+                    <th>Rent (₦)</th>
+                    <th>Total Due (₦)</th>
+                    <th>Paid (₦)</th>
+                    <th>Balance (₦)</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tenant in tenants %}
+                <tr>
+                    <td><a href="{% url 'tenants:detail' pk=tenant.pk %}"><strong>{{ tenant.name }}</strong></a></td>
+                    <td>{{ tenant.flat_or_room }}</td>
+                    <td>{{ tenant.phone|default:"-" }}</td>
+                    <td>₦{{ tenant.rent_amount|intcomma }}</td>
+                    <td>₦{{ tenant.total_due|intcomma }}</td>
+                    <td class="text-success">₦{{ tenant.total_paid|intcomma }}</td>
+                    <td>
+                        {% if tenant.balance > 0 %}
+                            <span class="text-danger font-bold">₦{{ tenant.balance|intcomma }}</span>
+                        {% else %}
+                            <span class="badge badge-success">Paid</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if tenant.is_active %}
+                            <span class="badge badge-success">Active</span>
+                        {% else %}
+                            <span class="badge badge-gray">Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div style="display: flex; gap: 4px;">
+                            <a href="{% url 'payments:create' %}?tenant={{ tenant.pk }}" class="btn btn-sm btn-success">💰</a>
+                            <a href="{% url 'tenants:update' pk=tenant.pk %}" class="btn btn-sm btn-secondary">✏️</a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="card-body">
+        <div class="empty-state">
+            <div class="empty-state-icon">👥</div>
+            <h3>No tenants yet</h3>
+            <p>Add tenants to this property to start tracking rent and payments.</p>
+            <a href="{% url 'tenants:create' %}?property={{ property.pk }}" class="btn btn-primary">+ Add First Tenant</a>
+        </div>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

@@ -1,110 +1,83 @@
 {% extends 'base.html' %}
 {% load humanize %}
 
-{% block title %}Property Assets{% endblock %}
-{% block page_title %}Property Portfolio{% endblock %}
-{% block page_subtitle %}You are currently managing {{ total_properties }} global property assets.{% endblock %}
+{% block title %}Properties{% endblock %}
+{% block page_title %}Properties{% endblock %}
+{% block page_subtitle %}{{ total_properties }} propert{{ total_properties|pluralize:"y,ies" }} under management{% endblock %}
 
 {% block page_actions %}
-<a href="{% url 'properties:create' %}" class="flex items-center gap-2 px-6 py-2.5 rounded-2xl bg-gradient-to-r from-teal-500 to-emerald-600 text-white font-bold shadow-lg shadow-teal-500/20 hover:shadow-teal-500/40 transition-all hover:-translate-y-0.5 group">
-    <i data-lucide="plus" class="w-5 h-5"></i>
-    <span>Add Property</span>
-</a>
+<a href="{% url 'properties:create' %}" class="btn btn-primary">+ Add Property</a>
 {% endblock %}
 
 {% block content %}
-<!-- Immersive Filter Bar -->
-<div class="glass-card mb-8 p-4 rounded-3xl flex flex-col md:flex-row items-center gap-4">
-    <form method="get" class="flex-1 flex flex-col md:flex-row items-center gap-4 w-full">
-        <div class="flex-1 relative w-full group">
-            <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-teal-500 transition-colors"></i>
-            <input type="text" name="search" value="{{ search }}" placeholder="Search by name, city, or address..." 
-                   class="w-full pl-11 pr-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 focus:outline-none focus:ring-4 focus:ring-teal-500/10 focus:border-teal-500 transition-all text-sm">
-        </div>
-        <div class="flex items-center gap-3 w-full md:w-auto">
-            <select name="status" class="flex-1 md:w-40 px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-sm focus:outline-none focus:border-teal-500" onchange="this.form.submit()">
-                <option value="">All Status</option>
-                <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
-                <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>Inactive</option>
-                <option value="maintenance" {% if status_filter == 'maintenance' %}selected{% endif %}>Under Maintenance</option>
-            </select>
-            <select name="type" class="flex-1 md:w-40 px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-sm focus:outline-none focus:border-teal-500" onchange="this.form.submit()">
-                <option value="">All Types</option>
-                <option value="residential" {% if type_filter == 'residential' %}selected{% endif %}>Residential</option>
-                <option value="commercial" {% if type_filter == 'commercial' %}selected{% endif %}>Commercial</option>
-                <option value="mixed" {% if type_filter == 'mixed' %}selected{% endif %}>Mixed Use</option>
-            </select>
-            <button type="submit" class="hidden md:flex p-3 rounded-2xl bg-slate-900 dark:bg-teal-500 text-white hover:bg-slate-800 transition-all">
-                <i data-lucide="arrow-right" class="w-5 h-5"></i>
-            </button>
-        </div>
-    </form>
-</div>
+<!-- Filter Bar -->
+<form method="get" class="filter-bar">
+    <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" name="search" value="{{ search }}" placeholder="Search properties..." class="form-input">
+    </div>
+    <select name="status" class="filter-select" onchange="this.form.submit()">
+        <option value="">All Status</option>
+        <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
+        <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>Inactive</option>
+        <option value="maintenance" {% if status_filter == 'maintenance' %}selected{% endif %}>Under Maintenance</option>
+    </select>
+    <select name="type" class="filter-select" onchange="this.form.submit()">
+        <option value="">All Types</option>
+        <option value="residential" {% if type_filter == 'residential' %}selected{% endif %}>Residential</option>
+        <option value="commercial" {% if type_filter == 'commercial' %}selected{% endif %}>Commercial</option>
+        <option value="mixed" {% if type_filter == 'mixed' %}selected{% endif %}>Mixed Use</option>
+    </select>
+    <button type="submit" class="btn btn-secondary">Search</button>
+</form>
 
 {% if properties %}
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+<div class="property-grid">
     {% for property in properties %}
-    <div class="glass-card rounded-[2.5rem] overflow-hidden group animate-slide-up">
-        <a href="{% url 'properties:detail' pk=property.pk %}" class="block relative h-64 overflow-hidden">
+    <a href="{% url 'properties:detail' pk=property.pk %}" class="property-card animate-in" style="text-decoration: none; color: inherit;">
+        <div class="property-card-image">
             {% if property.image %}
-                <img src="{{ property.image.url }}" alt="{{ property.name }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                <img src="{{ property.image.url }}" alt="{{ property.name }}">
             {% else %}
-                <div class="w-full h-full bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 flex items-center justify-center">
-                    <i data-lucide="building-2" class="w-16 h-16 text-slate-300 dark:text-slate-700"></i>
-                </div>
+                🏢
             {% endif %}
-            
-            <div class="absolute top-6 left-6">
-                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-md text-[10px] font-black uppercase tracking-widest {% if property.status == 'active' %}text-emerald-500{% elif property.status == 'maintenance' %}text-amber-500{% else %}text-slate-500{% endif %}">
-                    <div class="w-1.5 h-1.5 rounded-full animate-pulse {% if property.status == 'active' %}bg-emerald-500{% elif property.status == 'maintenance' %}bg-amber-500{% else %}bg-slate-500{% endif %}"></div>
+            <div class="property-card-badge">
+                <span class="badge {% if property.status == 'active' %}badge-success{% elif property.status == 'maintenance' %}badge-warning{% else %}badge-gray{% endif %}">
                     {{ property.get_status_display }}
                 </span>
             </div>
-        </a>
-        
-        <div class="p-8">
-            <div class="flex items-start justify-between mb-4">
-                <div>
-                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-1 group-hover:text-teal-500 transition-colors">
-                        {{ property.name }}
-                    </h3>
-                        <p class="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1.5 mt-1">
-                            <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
-                            {{ property.address|truncatewords:8 }}
-                        </p>
+        </div>
+        <div class="property-card-body">
+            <div class="property-card-name">{{ property.name }}</div>
+            <div class="property-card-address">📍 {{ property.address|truncatewords:10 }}</div>
+            <div class="property-card-stats">
+                <div class="property-stat">
+                    <div class="property-stat-value">{{ property.total_units }}</div>
+                    <div class="property-stat-label">Units</div>
                 </div>
-            </div>
-            
-            <div class="grid grid-cols-3 gap-4 border-t border-slate-100 dark:border-slate-800 pt-6 mt-2">
-                <div class="text-center">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Units</p>
-                    <p class="text-lg font-black dark:text-white">{{ property.total_units }}</p>
+                <div class="property-stat">
+                    <div class="property-stat-value">{{ property.occupied_units }}</div>
+                    <div class="property-stat-label">Occupied</div>
                 </div>
-                <div class="text-center">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Occupied</p>
-                    <p class="text-lg font-black text-teal-500">{{ property.occupied_units }}</p>
-                </div>
-                <div class="text-center">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Ratio</p>
-                    <p class="text-lg font-black dark:text-white">{{ property.occupancy_rate }}%</p>
+                <div class="property-stat">
+                    <div class="property-stat-value" style="color: {% if property.occupancy_rate >= 80 %}var(--success){% elif property.occupancy_rate >= 50 %}var(--warning){% else %}var(--danger){% endif %};">
+                        {{ property.occupancy_rate }}%
+                    </div>
+                    <div class="property-stat-label">Occupancy</div>
                 </div>
             </div>
         </div>
-    </div>
+    </a>
     {% endfor %}
 </div>
 {% else %}
-<div class="glass-card p-20 text-center rounded-4xl">
-    <div class="w-24 h-24 bg-slate-100 dark:bg-slate-800 rounded-4xl flex items-center justify-center mx-auto mb-8 text-slate-400">
-        <i data-lucide="building" class="w-12 h-12"></i>
+<div class="card">
+    <div class="empty-state">
+        <div class="empty-state-icon">🏢</div>
+        <h3>No properties yet</h3>
+        <p>Add your first property to start managing tenants and tracking payments.</p>
+        <a href="{% url 'properties:create' %}" class="btn btn-primary">+ Add Your First Property</a>
     </div>
-    <h3 class="text-3xl font-bold dark:text-white mb-4">No assets found</h3>
-    <p class="text-slate-500 dark:text-slate-400 max-w-md mx-auto mb-10 text-lg">Your portfolio is currently empty. Start building your property empire by adding your first asset.</p>
-    <a href="{% url 'properties:create' %}" class="inline-flex items-center gap-3 py-4 px-10 rounded-2xl bg-slate-900 dark:bg-teal-500 text-white font-bold text-lg shadow-2xl transition-all hover:scale-105">
-        <i data-lucide="plus" class="w-6 h-6"></i>
-        Add Your First Property
-    </a>
 </div>
 {% endif %}
 {% endblock %}
-

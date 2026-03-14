@@ -1,408 +1,181 @@
 {% extends 'base.html' %}
 {% load humanize %}
 
-{% block title %}Dashboard Intelligence{% endblock %}
-{% block page_title %}Real-time Analytics{% endblock %}
-{% block page_subtitle %}Welcome back, {{ request.user.first_name|default:request.user.username }}. Your property portfolio is performing 12% above benchmark.{% endblock %}
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block page_subtitle %}Welcome back, {{ request.user.first_name|default:request.user.username }}! Here's your overview.{% endblock %}
 
 {% block page_actions %}
-<div class="flex items-center gap-3">
-    <button class="p-2.5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200/50 dark:border-slate-700/50 text-slate-500 hover:text-teal-500 transition-all">
-        <i data-lucide="filter" class="w-5 h-5"></i>
-    </button>
-    <a href="{% url 'properties:create' %}" class="flex items-center gap-2 px-6 py-2.5 rounded-2xl bg-gradient-to-r from-teal-500 to-emerald-600 text-white font-bold shadow-lg shadow-teal-500/20 hover:shadow-teal-500/40 transition-all hover:-translate-y-0.5 group">
-        <i data-lucide="plus" class="w-5 h-5"></i>
-        <span>Add Property</span>
-    </a>
-</div>
+<a href="{% url 'properties:create' %}" class="btn btn-primary">+ Add Property</a>
 {% endblock %}
 
 {% block content %}
-<!-- AI Insights Header -->
-<div class="mb-10 p-6 rounded-3xl bg-gradient-to-r from-teal-500/10 to-indigo-500/10 border border-teal-500/20 backdrop-blur-md animate-slide-up">
-    <div class="flex items-start gap-4">
-        <div class="w-12 h-12 rounded-2xl bg-white dark:bg-slate-800 flex items-center justify-center shadow-sm">
-            <i data-lucide="activity" class="w-6 h-6 text-teal-500"></i>
-        </div>
-        <div>
-            <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-1">Portfolio Intelligence</h3>
-            <p class="text-sm text-slate-600 dark:text-slate-400 max-w-2xl">
-                Our predictive engine suggests a <span class="text-teal-500 font-bold">5.4% revenue increase</span> next month if you optimize the current vacant units in <span class="font-semibold text-slate-800 dark:text-slate-200 underline decoration-teal-500/30">Lagos Island properties</span>.
-            </p>
-        </div>
-        <button class="ml-auto text-xs font-bold uppercase tracking-widest text-teal-600 hover:text-teal-700 transition-colors">Details →</button>
+<!-- Stats Grid -->
+<div class="stats-grid">
+    <div class="stat-card animate-in">
+        <div class="stat-icon primary">🏢</div>
+        <div class="stat-value">{{ total_properties }}</div>
+        <div class="stat-label">Total Properties</div>
+    </div>
+    <div class="stat-card animate-in">
+        <div class="stat-icon info">👥</div>
+        <div class="stat-value">{{ total_tenants }}</div>
+        <div class="stat-label">Active Tenants</div>
+    </div>
+    <div class="stat-card animate-in accent">
+        <div class="stat-icon accent">💰</div>
+        <div class="stat-value">₦{{ total_revenue|intcomma }}</div>
+        <div class="stat-label">Total Revenue Collected</div>
+    </div>
+    <div class="stat-card animate-in danger">
+        <div class="stat-icon danger">📉</div>
+        <div class="stat-value">₦{{ total_outstanding|intcomma }}</div>
+        <div class="stat-label">Outstanding Balance</div>
     </div>
 </div>
 
-<!-- Main Stats Grid -->
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-    <!-- Total Properties -->
-    <div class="glass-card p-6 rounded-3xl animate-slide-up" style="animation-delay: 0.1s">
-        <div class="flex items-start justify-between mb-4">
-            <div class="w-12 h-12 rounded-2xl bg-teal-500/10 flex items-center justify-center">
-                <i data-lucide="building" class="w-6 h-6 text-teal-500"></i>
-            </div>
-            <span class="flex items-center gap-1 text-xs font-bold text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded-full">
-                <i data-lucide="trending-up" class="w-3 h-3"></i>
-                +2
-            </span>
+<!-- Second Row Stats -->
+<div class="stats-grid" style="margin-bottom: var(--space-xl);">
+    <div class="stat-card animate-in success">
+        <div class="stat-icon success">🏠</div>
+        <div class="stat-value">{{ occupied_units }} / {{ total_units }}</div>
+        <div class="stat-label">Occupied Units</div>
+        <div class="progress-bar" style="margin-top: 0.75rem;">
+            <div class="progress-fill {% if occupancy_rate < 50 %}danger{% elif occupancy_rate < 80 %}warning{% endif %}" style="width: {{ occupancy_rate }}%"></div>
         </div>
-        <h4 class="text-slate-500 dark:text-slate-400 text-sm font-medium mb-1">Total Properties</h4>
-        <div class="flex items-baseline gap-2">
-            <span class="text-3xl font-bold dark:text-white" x-data="{ count: 0, target: {{ total_properties }} }" x-init="let timer = setInterval(() => { if (count < target) count++; else clearInterval(timer) }, 50)" x-text="count">0</span>
-            <span class="text-slate-400 dark:text-slate-500 text-sm">Units</span>
-        </div>
-        <div class="mt-4 h-1 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-            <div class="h-full bg-teal-500 rounded-full" style="width: 70%"></div>
-        </div>
+        <div style="font-size: 0.72rem; color: var(--gray-500); margin-top: 4px;">{{ occupancy_rate }}% occupancy rate</div>
     </div>
-
-    <!-- Active Tenants -->
-    <div class="glass-card p-6 rounded-3xl animate-slide-up" style="animation-delay: 0.2s">
-        <div class="flex items-start justify-between mb-4">
-            <div class="w-12 h-12 rounded-2xl bg-indigo-500/10 flex items-center justify-center">
-                <i data-lucide="users" class="w-6 h-6 text-indigo-500"></i>
-            </div>
-            <span class="flex items-center gap-1 text-xs font-bold text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded-full">
-                <i data-lucide="trending-up" class="w-3 h-3"></i>
-                84%
-            </span>
-        </div>
-        <h4 class="text-slate-500 dark:text-slate-400 text-sm font-medium mb-1">Active Tenants</h4>
-        <div class="flex items-baseline gap-2">
-            <span class="text-3xl font-bold dark:text-white" x-data="{ count: 0, target: {{ total_tenants }} }" x-init="let timer = setInterval(() => { if (count < target) count++; else clearInterval(timer) }, 30)" x-text="count">0</span>
-            <span class="text-slate-400 text-sm">Members</span>
-        </div>
-        <div class="mt-4 flex gap-1">
-            <template x-for="i in 5">
-                <div class="h-1 flex-1 rounded-full" :class="i <= 4 ? 'bg-indigo-500' : 'bg-slate-200 dark:bg-slate-800'"></div>
-            </template>
-        </div>
-    </div>
-
-    <!-- Revenue Collected -->
-    <div class="glass-card p-6 rounded-3xl animate-slide-up" style="animation-delay: 0.3s">
-        <div class="flex items-start justify-between mb-4">
-            <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center">
-                <i data-lucide="banknote" class="w-6 h-6 text-emerald-500"></i>
-            </div>
-            <div class="text-right">
-                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">Growth</p>
-                <span class="text-xs font-bold text-emerald-500">+12.4%</span>
-            </div>
-        </div>
-        <h4 class="text-slate-500 dark:text-slate-400 text-sm font-medium mb-1">Total Revenue</h4>
-        <div class="flex items-baseline gap-1">
-            <span class="text-lg font-bold text-slate-400">₦</span>
-            <span class="text-3xl font-bold dark:text-white">{{ total_revenue|intcomma }}</span>
-        </div>
-        <div class="mt-4">
-            <canvas id="miniRevenueChart" height="40"></canvas>
-        </div>
-    </div>
-
-    <!-- Outstanding Balance -->
-    <div class="glass-card p-6 rounded-3xl animate-slide-up" style="animation-delay: 0.4s">
-        <div class="flex items-start justify-between mb-4">
-            <div class="w-12 h-12 rounded-2xl bg-orange-500/10 flex items-center justify-center">
-                <i data-lucide="clock" class="w-6 h-6 text-orange-500"></i>
-            </div>
-            <span class="flex items-center gap-1 text-xs font-bold text-orange-500 bg-orange-500/10 px-2 py-1 rounded-full">
-                Attention
-            </span>
-        </div>
-        <h4 class="text-slate-500 dark:text-slate-400 text-sm font-medium mb-1">Outstanding</h4>
-        <div class="flex items-baseline gap-1">
-            <span class="text-lg font-bold text-slate-400">₦</span>
-            <span class="text-3xl font-bold dark:text-white text-orange-500">{{ total_outstanding|intcomma }}</span>
-        </div>
-        <div class="mt-4 flex items-center gap-2">
-            <div class="flex -space-x-2">
-                <div class="w-6 h-6 rounded-full bg-slate-200 border-2 border-white dark:border-slate-800 flex items-center justify-center text-[8px] font-bold">JD</div>
-                <div class="w-6 h-6 rounded-full bg-slate-300 border-2 border-white dark:border-slate-800 flex items-center justify-center text-[8px] font-bold">AS</div>
-                <div class="w-6 h-6 rounded-full bg-slate-400 border-2 border-white dark:border-slate-800 flex items-center justify-center text-[8px] font-bold">+3</div>
-            </div>
-            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tight">Pending Approval</span>
-        </div>
+    <div class="stat-card animate-in">
+        <div class="stat-icon primary">🔑</div>
+        <div class="stat-value">{{ vacant_units }}</div>
+        <div class="stat-label">Vacant Units</div>
     </div>
 </div>
 
-<!-- Visualization & Content Grid -->
-<div class="grid grid-cols-1 xl:grid-cols-3 gap-8 mb-10">
-    <!-- Occupancy Analytics -->
-    <div class="xl:col-span-2 glass-card rounded-3xl overflow-hidden animate-slide-up" style="animation-delay: 0.5s">
-        <div class="p-8 border-b border-slate-200/50 dark:border-slate-800/50 flex items-center justify-between bg-white/30 dark:bg-slate-900/10 backdrop-blur-md">
-            <div>
-                <h3 class="text-xl font-bold dark:text-white">Revenue & Growth</h3>
-                <p class="text-sm text-slate-500 dark:text-slate-400">Live performance tracking across all 2026 pipelines</p>
-            </div>
-            <div class="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
-                <button class="px-4 py-1.5 text-xs font-bold rounded-lg bg-white dark:bg-slate-700 shadow-sm text-slate-900 dark:text-white">Monthly</button>
-                <button class="px-4 py-1.5 text-xs font-bold rounded-lg text-slate-500">Yearly</button>
-            </div>
+<!-- Content Grid -->
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-xl);">
+    <!-- Recent Payments -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Recent Payments</h3>
+            <a href="{% url 'payments:list' %}" class="btn btn-sm btn-secondary">View All</a>
         </div>
-        <div class="p-8">
-            <div class="h-[350px]">
-                <canvas id="mainPerformanceChart"></canvas>
-            </div>
-        </div>
-    </div>
-
-    <!-- Occupancy Donut -->
-    <div class="glass-card rounded-3xl p-8 animate-slide-up" style="animation-delay: 0.6s">
-        <h3 class="text-xl font-bold dark:text-white mb-2">Unit Occupancy</h3>
-        <p class="text-sm text-slate-500 dark:text-slate-400 mb-8">Capacity utilization map</p>
-        
-        <div class="relative h-64 mb-8">
-            <canvas id="occupancyDonutChart"></canvas>
-            <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                <span class="text-4xl font-extrabold dark:text-white">{{ occupancy_rate }}%</span>
-                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Occupied</span>
-            </div>
-        </div>
-        
-        <div class="space-y-4">
-            <div class="flex items-center justify-between text-sm">
-                <div class="flex items-center gap-2">
-                    <div class="w-3 h-3 rounded-full bg-teal-500"></div>
-                    <span class="text-slate-600 dark:text-slate-400">Occupied Units</span>
-                </div>
-                <span class="font-bold dark:text-white">{{ occupied_units }}</span>
-            </div>
-            <div class="flex items-center justify-between text-sm">
-                <div class="flex items-center gap-2">
-                    <div class="w-3 h-3 rounded-full bg-slate-200 dark:bg-slate-700"></div>
-                    <span class="text-slate-600 dark:text-slate-400">Vacant Units</span>
-                </div>
-                <span class="font-bold dark:text-white">{{ vacant_units }}</span>
-            </div>
-        </div>
-        
-        <button class="w-full mt-8 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 font-bold text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">Detailed Unit Map →</button>
-    </div>
-</div>
-
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-    <!-- Recent Transactions -->
-    <div class="glass-card rounded-3xl overflow-hidden animate-slide-up" style="animation-delay: 0.7s">
-        <div class="p-6 border-b border-slate-200/50 dark:border-slate-800/50 bg-white/30 dark:bg-slate-900/10 flex items-center justify-between">
-            <h3 class="text-lg font-bold dark:text-white">Recent Payments</h3>
-            <a href="{% url 'payments:list' %}" class="text-xs font-bold text-teal-600 uppercase tracking-widest">View Archives</a>
-        </div>
-        <div class="overflow-x-auto no-scrollbar">
+        <div class="card-body" style="padding: 0;">
             {% if recent_payments %}
-            <table class="w-full text-left">
-                <thead>
-                    <tr class="bg-slate-50/50 dark:bg-slate-800/30">
-                        <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Tenant / Assets</th>
-                        <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Amount</th>
-                        <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center">Date</th>
-                        <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Status</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
-                    {% for payment in recent_payments %}
-                    <tr class="table-row-futuristic group">
-                        <td class="px-6 py-4">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-bold text-xs">
-                                    {{ payment.tenant.name|make_list|slice:":2"|join:""|upper }}
-                                </div>
-                                <div>
-                                    <p class="text-sm font-bold dark:text-white leading-tight mb-0.5">{{ payment.tenant.name }}</p>
-                                    <p class="text-xs text-slate-500 dark:text-slate-400">{{ payment.tenant.building.name }}</p>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 text-right font-bold dark:text-white">₦{{ payment.amount|intcomma }}</td>
-                        <td class="px-6 py-4 text-center text-xs text-slate-500">{{ payment.payment_date|date:"M d, Y" }}</td>
-                        <td class="px-6 py-4">
-                            <span class="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest text-emerald-500 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
-                                <i data-lucide="check" class="w-3 h-3"></i>
-                                Confirmed
-                            </span>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Tenant</th>
+                            <th>Amount</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for payment in recent_payments %}
+                        <tr>
+                            <td>
+                                <strong>{{ payment.tenant.name }}</strong>
+                                <br><small class="text-muted">{{ payment.tenant.building.name }}</small>
+                            </td>
+                            <td><strong>₦{{ payment.amount|intcomma }}</strong></td>
+                            <td>{{ payment.payment_date|date:"M d, Y" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             {% else %}
-            <div class="p-12 text-center">
-                <div class="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-3xl flex items-center justify-center mx-auto mb-4">
-                    <i data-lucide="credit-card" class="w-8 h-8 text-slate-400"></i>
+                <div class="empty-state" style="padding: var(--space-xl);">
+                    <div class="empty-state-icon">💳</div>
+                    <h3>No payments recorded yet</h3>
+                    <p>Payment records will appear here as you add them.</p>
+                    <a href="{% url 'payments:create' %}" class="btn btn-primary btn-sm">Record Payment</a>
                 </div>
-                <h4 class="text-lg font-bold dark:text-white mb-2">Digital Vault is Empty</h4>
-                <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">No payment records found in this cycle.</p>
-                <a href="{% url 'payments:create' %}" class="inline-flex py-3 px-6 rounded-2xl bg-slate-900 dark:bg-teal-500 text-white font-bold text-sm shadow-xl transition-all hover:scale-105">+ Record First Payment</a>
-            </div>
             {% endif %}
         </div>
     </div>
 
-    <!-- Critical Alerts -->
-    <div class="glass-card rounded-3xl overflow-hidden animate-slide-up" style="animation-delay: 0.8s">
-        <div class="p-6 border-b border-slate-200/50 dark:border-slate-800/50 bg-white/30 dark:bg-slate-900/10 flex items-center justify-between">
-            <h3 class="text-lg font-bold dark:text-white flex items-center gap-2">
-                <i data-lucide="alert-triangle" class="w-5 h-5 text-orange-500"></i>
-                Critical Awareness
-            </h3>
-            <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-orange-500/10 text-orange-500">{{ expiring_tenancies.count }} Items</span>
+    <!-- Expiring Tenancies -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">⚠️ Expiring Soon</h3>
+            <span class="badge badge-warning">{{ expiring_tenancies.count }} tenancies</span>
         </div>
-        <div class="p-6 space-y-4">
+        <div class="card-body" style="padding: 0;">
             {% if expiring_tenancies %}
-                {% for tenant in expiring_tenancies %}
-                <div class="p-4 rounded-2xl border border-orange-200/30 bg-orange-50/20 dark:bg-orange-900/5 dark:border-orange-500/10 flex items-center gap-4 group hover:ring-2 hover:ring-orange-500/20 transition-all">
-                    <div class="w-12 h-12 rounded-xl bg-orange-100 dark:bg-orange-800/50 flex flex-col items-center justify-center">
-                        <span class="text-[10px] font-bold text-orange-600 dark:text-orange-400 uppercase tracking-tighter">{{ tenant.tenancy_end|date:"M" }}</span>
-                        <span class="text-sm font-black text-orange-700 dark:text-orange-300">{{ tenant.tenancy_end|date:"d" }}</span>
-                    </div>
-                    <div class="flex-1">
-                        <p class="text-sm font-bold dark:text-white mb-0.5 group-hover:text-orange-600 transition-colors">{{ tenant.name }}</p>
-                        <p class="text-xs text-slate-500 dark:text-slate-400">{{ tenant.building.name }} — <span class="text-orange-500 font-medium">Expiring in {{ tenant.tenancy_end|timeuntil }}</span></p>
-                    </div>
-                    <button class="w-8 h-8 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-teal-500 transition-colors">
-                        <i data-lucide="mail" class="w-4 h-4"></i>
-                    </button>
-                </div>
-                {% endfor %}
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Tenant</th>
+                            <th>Property</th>
+                            <th>Expires</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for tenant in expiring_tenancies %}
+                        <tr>
+                            <td><strong>{{ tenant.name }}</strong></td>
+                            <td>{{ tenant.building.name }}</td>
+                            <td>
+                                <span class="badge badge-warning">{{ tenant.tenancy_end|date:"M d, Y" }}</span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             {% else %}
-            <div class="p-12 text-center">
-                <div class="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-3xl flex items-center justify-center mx-auto mb-4 text-emerald-500">
-                    <i data-lucide="shield-check" class="w-8 h-8"></i>
+                <div class="empty-state" style="padding: var(--space-xl);">
+                    <div class="empty-state-icon">✅</div>
+                    <h3>All clear!</h3>
+                    <p>No tenancies expiring in the next 30 days.</p>
                 </div>
-                <h4 class="text-lg font-bold dark:text-white mb-2">Operational Calm</h4>
-                <p class="text-sm text-slate-500">No imminent lease expirations detected.</p>
-            </div>
             {% endif %}
-            
-            <a href="{% url 'tenants:list' %}" class="flex items-center justify-center gap-2 w-full py-4 text-sm font-bold text-slate-500 hover:text-teal-500 transition-colors">
-                Explore Tenant Intelligence
-                <i data-lucide="chevron-right" class="w-4 h-4"></i>
-            </a>
         </div>
     </div>
 </div>
-{% endblock %}
 
-{% block extra_js %}
-    <!-- Data for JS -->
-    <div id="dashboard-data" 
-         class="hidden" 
-         data-occupancy="{{ occupancy_rate|default:0 }}"
-         data-vacant="{{ 100|add:occupancy_rate|add:"-100"|default:100 }}">
+<!-- Properties Overview -->
+{% if properties %}
+<div style="margin-top: var(--space-xl);">
+    <div class="flex-between" style="margin-bottom: var(--space-lg);">
+        <h3 style="font-size: 1.1rem; font-weight: 700;">Your Properties</h3>
+        <a href="{% url 'properties:list' %}" class="btn btn-sm btn-secondary">View All →</a>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        const dataEl = document.getElementById('dashboard-data');
-        const occupancyVal = parseFloat(dataEl.dataset.occupancy);
-        const vacantVal = parseFloat(dataEl.dataset.vacant);
-
-        // System Theme Detection for Charts
-        const isDark = document.documentElement.classList.contains('dark') || 
-                       (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
-        const chartTextColor = isDark ? '#94a3b8' : '#64748b';
-        const chartGridColor = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
-
-        // Mini Revenue Sparkline
-        const miniCtx = document.getElementById('miniRevenueChart').getContext('2d');
-        new Chart(miniCtx, {
-            type: 'line',
-            data: {
-                labels: [1, 2, 3, 4, 5, 6, 7],
-                datasets: [{
-                    data: [45, 52, 48, 61, 55, 68, 72],
-                    borderColor: '#10b981',
-                    borderWidth: 2,
-                    tension: 0.4,
-                    pointRadius: 0
-                }]
-            },
-            options: {
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: { x: { display: false }, y: { display: false } }
-            }
-        });
-
-        // Main Performance Chart
-        const mainCtx = document.getElementById('mainPerformanceChart').getContext('2d');
-        const gradient = mainCtx.createLinearGradient(0, 0, 0, 350);
-        gradient.addColorStop(0, 'rgba(20, 184, 166, 0.2)');
-        gradient.addColorStop(1, 'rgba(20, 184, 166, 0)');
-
-        new Chart(mainCtx, {
-            type: 'line',
-            data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
-                datasets: [{
-                    label: 'Gross Revenue 2026',
-                    data: [1200000, 1500000, 1400000, 1800000, 2200000, 2100000, 2600000, 2900000],
-                    borderColor: '#14b8a6',
-                    borderWidth: 3,
-                    tension: 0.4,
-                    fill: true,
-                    backgroundColor: gradient,
-                    pointBackgroundColor: '#14b8a6',
-                    pointBorderColor: '#fff',
-                    pointBorderWidth: 2,
-                    pointRadius: 4,
-                    pointHoverRadius: 6
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        backgroundColor: isDark ? '#1e293b' : '#fff',
-                        titleColor: isDark ? '#fff' : '#1e293b',
-                        bodyColor: isDark ? '#cbd5e1' : '#64748b',
-                        padding: 12,
-                        borderRadius: 12,
-                        displayColors: false,
-                        callbacks: {
-                            label: function(context) {
-                                return '₦' + context.parsed.y.toLocaleString();
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        grid: { color: chartGridColor, drawBorder: false },
-                        ticks: { color: chartTextColor, font: { family: 'Outfit', size: 10 } }
-                    },
-                    x: {
-                        grid: { display: false },
-                        ticks: { color: chartTextColor, font: { family: 'Outfit', size: 10 } }
-                    }
-                }
-            }
-        });
-
-        // Occupancy Donut
-        const donutCtx = document.getElementById('occupancyDonutChart').getContext('2d');
-        new Chart(donutCtx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Occupied', 'Vacant'],
-                datasets: [{
-                    data: [occupancyVal, vacantVal],
-                    backgroundColor: ['#14b8a6', isDark ? '#1e293b' : '#f1f5f9'],
-                    borderWidth: 0,
-                    cutout: '80%'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } }
-            }
-        });
-    </script>
+    <div class="property-grid">
+        {% for property in properties %}
+        <a href="{% url 'properties:detail' pk=property.pk %}" class="property-card" style="text-decoration: none; color: inherit;">
+            <div class="property-card-image">
+                {% if property.image %}
+                    <img src="{{ property.image.url }}" alt="{{ property.name }}">
+                {% else %}
+                    🏢
+                {% endif %}
+                <div class="property-card-badge">
+                    <span class="badge {% if property.status == 'active' %}badge-success{% elif property.status == 'maintenance' %}badge-warning{% else %}badge-gray{% endif %}">
+                        {{ property.get_status_display }}
+                    </span>
+                </div>
+            </div>
+            <div class="property-card-body">
+                <div class="property-card-name">{{ property.name }}</div>
+                <div class="property-card-address">📍 {{ property.address|truncatewords:8 }}</div>
+                <div class="property-card-stats">
+                    <div class="property-stat">
+                        <div class="property-stat-value">{{ property.total_units }}</div>
+                        <div class="property-stat-label">Units</div>
+                    </div>
+                    <div class="property-stat">
+                        <div class="property-stat-value">{{ property.occupied_units }}</div>
+                        <div class="property-stat-label">Occupied</div>
+                    </div>
+                    <div class="property-stat">
+                        <div class="property-stat-value">{{ property.vacant_units }}</div>
+                        <div class="property-stat-label">Vacant</div>
+                    </div>
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
 {% endblock %}
-
-
-

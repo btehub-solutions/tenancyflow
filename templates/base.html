@@ -1,313 +1,175 @@
 {% load static %} {% load humanize %}
 <!doctype html>
-<html lang="en" class="h-full" 
-      x-data="{ 
-          sidebarOpen: true, 
-          darkMode: localStorage.getItem('darkMode') === 'true' 
-      }"
-      x-init="$watch('darkMode', val => localStorage.setItem('darkMode', val))"
-      :class="{ 'dark': darkMode }">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="TenancyFlow - Professional Property Management Software"
+      content="TenancyFlow - Professional Property Management Software for Nigerian Real Estate Agents"
     />
     <title>
-        {% block title %}TenancyFlow{% endblock %} | 2026 Global Edition
+      {% block title %}TenancyFlow{% endblock %} | Property Management
     </title>
-    
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        darkMode: 'class',
-        theme: {
-          extend: {
-            colors: {
-              primary: {
-                50: '#f0fdfa',
-                100: '#ccfbf1',
-                200: '#99f6e4',
-                300: '#5eead4',
-                400: '#2dd4bf',
-                500: '#14b8a6',
-                600: '#0d9488',
-                700: '#0f766e',
-                800: '#115e59',
-                900: '#134e4a',
-                950: '#042f2e',
-              },
-              neon: {
-                emerald: '#10b981',
-                cyan: '#06b6d4',
-              }
-            },
-            fontFamily: {
-              sans: ['Outfit', 'Plus Jakarta Sans', 'sans-serif'],
-            },
-            borderRadius: {
-              '2xl': '1rem',
-              '3xl': '1.5rem',
-              '4xl': '2rem',
-            }
-          }
-        }
-      }
-    </script>
-    
-    <!-- Custom Futuristic CSS -->
-    <link rel="stylesheet" href="{% static 'css/futuristic.css' %}" />
-    
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    
-    <!-- Alpine JS -->
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
     <link
       rel="icon"
-      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='%2314b8a6'><rect width='100' height='100' rx='25'/><path d='M30 70V40L50 25L70 40V70H55V55H45V70H30Z' fill='white'/></svg>"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>"
     />
-
-    <!-- Pre-check dark mode to avoid flash -->
-    <script>
-        if (localStorage.getItem('darkMode') === 'true') {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
-    </script>
-    
     {% block extra_css %}{% endblock %}
   </head>
-  <body class="h-full overflow-hidden font-sans antialiased text-slate-900 dark:text-slate-100 bg-slate-50 dark:bg-[#0b1120] selection:bg-teal-100 selection:text-teal-900 transition-colors duration-300">
-    
-    <!-- Background Elements -->
-    <div class="fixed inset-0 pointer-events-none -z-10 bg-slate-50 dark:bg-[#0b1120] transition-colors duration-500">
-        <div class="absolute top-0 -left-4 w-96 h-96 bg-teal-400/10 dark:bg-teal-600/5 rounded-full blur-3xl opacity-50"></div>
-        <div class="absolute top-1/2 -right-4 w-[30rem] h-[30rem] bg-indigo-400/10 dark:bg-indigo-600/5 rounded-full blur-[80px] opacity-40"></div>
-    </div>
-
-    <div class="flex h-screen overflow-hidden">
-      <!-- Enhanced Futuristic Sidebar -->
-      <aside 
-        class="relative z-40 flex flex-col h-screen transition-all duration-500 ease-in-out border-r border-slate-200/50 dark:border-slate-800/50 glass-sidebar backdrop-blur-xl"
-        :class="sidebarOpen ? 'w-72' : 'w-20'"
-      >
-        <div class="flex items-center gap-3 px-6 py-8 overflow-hidden">
-          <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-500/30">
-            <i data-lucide="home" class="w-6 h-6 text-white text-glow"></i>
-          </div>
-          <span 
-            class="text-xl font-bold tracking-tight text-slate-900 dark:text-white transition-opacity duration-300"
-            :class="sidebarOpen ? 'opacity-100' : 'opacity-0'"
-          >
-            Tenancy<span class="text-teal-500">Flow</span>
-          </span>
+  <body>
+    <div class="app-layout">
+      <!-- Sidebar Navigation -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+          <div class="brand-icon">🏠</div>
+          <h1>TenancyFlow</h1>
         </div>
 
-        <nav class="flex-1 px-4 space-y-1 overflow-y-auto no-scrollbar py-4">
-          <p 
-            class="px-4 text-[10px] font-bold tracking-widest text-slate-400 uppercase transition-opacity duration-300"
-            :class="sidebarOpen ? 'opacity-100' : 'opacity-0'"
-          >
-            Main Dashboard
-          </p>
+        <nav class="sidebar-nav">
+          <div class="nav-section-title">Main</div>
           <a
             href="{% url 'dashboard:index' %}"
-            class="flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-300 group nav-link-futuristic {% if request.resolver_match.app_name == 'dashboard' %}active{% endif %}"
+            class="nav-link {% if request.resolver_match.app_name == 'dashboard' %}active{% endif %}"
           >
-            <i data-lucide="layout-dashboard" class="w-5 h-5 flex-shrink-0"></i>
-            <span class="font-medium whitespace-nowrap transition-opacity duration-300" :class="sidebarOpen ? 'opacity-100' : 'opacity-0'">Dashboard</span>
+            <span class="nav-icon">📊</span>
+            <span>Dashboard</span>
           </a>
 
-          <div class="pt-6">
-            <p 
-              class="px-4 text-[10px] font-bold tracking-widest text-slate-400 uppercase transition-opacity duration-300"
-              :class="sidebarOpen ? 'opacity-100' : 'opacity-0'"
-            >
-              Management
-            </p>
-            <a
-              href="{% url 'properties:list' %}"
-              class="flex items-center gap-4 px-4 py-3 mt-1 rounded-2xl transition-all duration-300 group nav-link-futuristic {% if request.resolver_match.app_name == 'properties' %}active{% endif %}"
-            >
-              <i data-lucide="building-2" class="w-5 h-5 flex-shrink-0"></i>
-              <span class="font-medium whitespace-nowrap transition-opacity duration-300" :class="sidebarOpen ? 'opacity-100' : 'opacity-0'">Properties</span>
-            </a>
-            <a
-              href="{% url 'tenants:list' %}"
-              class="flex items-center gap-4 px-4 py-3 mt-1 rounded-2xl transition-all duration-300 group nav-link-futuristic {% if request.resolver_match.app_name == 'tenants' %}active{% endif %}"
-            >
-              <i data-lucide="users" class="w-5 h-5 flex-shrink-0"></i>
-              <span class="font-medium whitespace-nowrap transition-opacity duration-300" :class="sidebarOpen ? 'opacity-100' : 'opacity-0'">Tenants</span>
-            </a>
-            <a
-              href="{% url 'payments:list' %}"
-              class="flex items-center gap-4 px-4 py-3 mt-1 rounded-2xl transition-all duration-300 group nav-link-futuristic {% if request.resolver_match.app_name == 'payments' %}active{% endif %}"
-            >
-              <i data-lucide="banknote" class="w-5 h-5 flex-shrink-0"></i>
-              <span class="font-medium whitespace-nowrap transition-opacity duration-300" :class="sidebarOpen ? 'opacity-100' : 'opacity-0'">Payments</span>
-            </a>
-          </div>
+          <div class="nav-section-title">Management</div>
+          <a
+            href="{% url 'properties:list' %}"
+            class="nav-link {% if request.resolver_match.app_name == 'properties' %}active{% endif %}"
+          >
+            <span class="nav-icon">🏢</span>
+            <span>Properties</span>
+          </a>
+          <a
+            href="{% url 'tenants:list' %}"
+            class="nav-link {% if request.resolver_match.app_name == 'tenants' %}active{% endif %}"
+          >
+            <span class="nav-icon">👥</span>
+            <span>Tenants</span>
+          </a>
+          <a
+            href="{% url 'payments:list' %}"
+            class="nav-link {% if request.resolver_match.app_name == 'payments' %}active{% endif %}"
+          >
+            <span class="nav-icon">💰</span>
+            <span>Payments</span>
+          </a>
 
-          <div class="pt-6 border-t border-slate-200/50 dark:border-slate-800/50 mt-6">
-            <a
-              href="#"
-              class="flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-300 group nav-link-futuristic"
-            >
-              <i data-lucide="wrench" class="w-5 h-5 flex-shrink-0"></i>
-              <span class="font-medium whitespace-nowrap transition-opacity duration-300" :class="sidebarOpen ? 'opacity-100' : 'opacity-0'">Maintenance</span>
-            </a>
-            <a
-              href="#"
-              class="flex items-center gap-4 px-4 py-3 mt-1 rounded-2xl transition-all duration-300 group nav-link-futuristic"
-            >
-              <i data-lucide="pie-chart" class="w-5 h-5 flex-shrink-0"></i>
-              <span class="font-medium whitespace-nowrap transition-opacity duration-300" :class="sidebarOpen ? 'opacity-100' : 'opacity-0'">Reports</span>
-            </a>
-          </div>
+          <div class="nav-section-title">Account</div>
+          <a
+            href="{% url 'accounts:profile' %}"
+            class="nav-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}"
+          >
+            <span class="nav-icon">⚙️</span>
+            <span>Settings</span>
+          </a>
+          {% if request.user.is_superuser %}
+          <a
+            href="{% url 'accounts:invite_agent' %}"
+            class="nav-link {% if request.resolver_match.url_name == 'invite_agent' %}active{% endif %}"
+          >
+            <span class="nav-icon">💌</span>
+            <span>Invite Agent</span>
+          </a>
+          {% endif %}
+          <a href="{% url 'accounts:logout' %}" class="nav-link">
+            <span class="nav-icon">🚪</span>
+            <span>Logout</span>
+          </a>
         </nav>
 
-        <div class="p-4 border-t border-slate-200/50 dark:border-slate-800/50">
-          <div class="flex flex-col gap-2">
-            <a
-                href="{% url 'accounts:profile' %}"
-                class="flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-300 group nav-link-futuristic"
-            >
-                <i data-lucide="settings" class="w-5 h-5 flex-shrink-0"></i>
-                <span class="font-medium whitespace-nowrap" :class="sidebarOpen ? 'block' : 'hidden'">Settings</span>
-            </a>
-            <a
-              href="{% url 'accounts:logout' %}"
-              class="flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-300 group hover:bg-red-50 dark:hover:bg-red-900/10 text-slate-500 hover:text-red-500"
-            >
-              <i data-lucide="log-out" class="w-5 h-5 flex-shrink-0"></i>
-              <span class="font-medium whitespace-nowrap" :class="sidebarOpen ? 'block' : 'hidden'">Logout</span>
-            </a>
-          </div>
-          
-          <div 
-            class="flex items-center gap-3 mt-6 px-2 py-2 rounded-2xl bg-slate-100/50 dark:bg-slate-800/50 border border-slate-200/50 dark:border-slate-700/50 transition-all duration-300"
-            :class="sidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'"
+        <div class="sidebar-footer">
+          <a
+            href="{% url 'accounts:profile' %}"
+            class="user-card"
+            style="text-decoration: none"
           >
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm shadow-md">
-                {{ request.user.username|make_list|first|upper }}
+            <div class="user-avatar">
+              {{ request.user.username|make_list|first|upper }}
             </div>
-            <div class="overflow-hidden">
-                <p class="text-xs font-bold text-slate-900 dark:text-white truncate">{{ request.user.get_full_name|default:request.user.username }}</p>
-                <p class="text-[10px] text-slate-500 dark:text-slate-400 truncate">{{ request.user.company_name|default:"Elite Agent" }}</p>
+            <div class="user-info">
+              <div class="user-name">
+                {{ request.user.get_full_name|default:request.user.username }}
+              </div>
+              <div class="user-role">
+                {{ request.user.company_name|default:"Agent" }}
+              </div>
             </div>
-          </div>
+          </a>
         </div>
-        
-        <!-- Sidebar Toggle Button -->
-        <button 
-            @click="sidebarOpen = !sidebarOpen"
-            class="absolute -right-3 top-20 w-6 h-6 rounded-full bg-white dark:bg-slate-800 shadow-md border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-500 hover:text-teal-500 transition-colors z-50 focus:outline-none"
-        >
-            <i :data-lucide="sidebarOpen ? 'chevron-left' : 'chevron-right'" class="w-4 h-4"></i>
-        </button>
       </aside>
 
-      <!-- Main Content Area -->
-      <main class="flex-1 flex flex-col min-w-0 overflow-hidden relative">
+      <!-- Main Content -->
+      <main class="main-content">
         <!-- Top Bar -->
-        <header class="h-20 flex items-center justify-between px-8 z-30 transition-all duration-300 bg-white/5 dark:bg-slate-900/5 backdrop-blur-md">
-            <div class="flex items-center gap-4">
-                <h1 class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
-                    {% block page_title %}Overview{% endblock %}
-                </h1>
-                <div class="hidden md:flex items-center px-4 py-2 rounded-2xl bg-slate-100/50 dark:bg-slate-800/50 border border-slate-200/50 dark:border-slate-700/50 w-80 ring-teal-500/20 focus-within:ring-4 transition-all duration-300">
-                    <i data-lucide="search" class="w-4 h-4 text-slate-400"></i>
-                    <input type="text" placeholder="Search anything (Cmd+K)..." class="bg-transparent border-none focus:ring-0 text-sm w-full ml-3 placeholder:text-slate-400">
-                </div>
+        <header class="top-bar">
+          <div class="top-bar-left">
+            <button
+              class="mobile-menu-btn"
+              onclick="toggleSidebar()"
+              aria-label="Toggle menu"
+            >
+              ☰
+            </button>
+            <div>
+              <h2 class="page-title">
+                {% block page_title %}Dashboard{% endblock %}
+              </h2>
+              <p class="page-subtitle">
+                {% block page_subtitle %}{% endblock %}
+              </p>
             </div>
-
-            <div class="flex items-center gap-4">
-                <button 
-                    @click="darkMode = !darkMode" 
-                    class="p-2.5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200/50 dark:border-slate-700/50 text-slate-500 dark:text-slate-400 hover:text-teal-500 hover:border-teal-500/50 transition-all"
-                    title="Toggle Dark Mode"
-                >
-                    <i :data-lucide="darkMode ? 'sun' : 'moon'" class="w-5 h-5"></i>
-                </button>
-                
-                <div class="relative" x-data="{ open: false }">
-                    <button 
-                        @click="open = !open"
-                        class="p-2.5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200/50 dark:border-slate-700/50 text-slate-500 dark:text-slate-400 hover:text-teal-500 hover:border-teal-500/50 transition-all relative"
-                    >
-                        <i data-lucide="bell" class="w-5 h-5"></i>
-                        <span class="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-slate-800"></span>
-                    </button>
-                </div>
-
-                <div class="h-8 w-px bg-slate-200 dark:bg-slate-800 mx-2"></div>
-                
-                {% block page_actions %}{% endblock %}
-            </div>
+          </div>
+          <div class="top-bar-right">
+            {% block page_actions %}{% endblock %}
+          </div>
         </header>
 
-        <!-- Dynamic Content -->
-        <div class="flex-1 overflow-y-auto no-scrollbar pb-12 px-8 pt-4">
-            <!-- Breadcrumbs / Subtitle -->
-            <div class="mb-8">
-                <p class="text-sm text-slate-500 dark:text-slate-400 font-medium">
-                    {% block page_subtitle %}Global Real Estate Intelligence Platform{% endblock %}
-                </p>
-            </div>
-
-            <!-- Messages -->
-            {% if messages %}
-            <div class="fixed top-6 left-1/2 -translate-x-1/2 z-[100] space-y-4 w-full max-w-md pointer-events-none">
-                {% for message in messages %}
-                <div
-                    class="alert-futuristic pointer-events-auto p-4 rounded-2xl border backdrop-blur-xl shadow-2xl flex items-center justify-between transition-all duration-500 animate-slide-up"
-                    :class="{
-                        'bg-teal-50/90 border-teal-200 text-teal-800 dark:bg-teal-900/20 dark:border-teal-500/30 dark:text-teal-300': '{{ message.tags }}' === 'success',
-                        'bg-red-50/90 border-red-200 text-red-800 dark:bg-red-900/20 dark:border-red-500/30 dark:text-red-300': '{{ message.tags }}' === 'error',
-                        'bg-amber-50/90 border-amber-200 text-amber-800 dark:bg-amber-900/20 dark:border-amber-500/30 dark:text-amber-300': '{{ message.tags }}' === 'warning'
-                    }"
-                    x-data="{ show: true }"
-                    x-show="show"
-                    x-init="setTimeout(() => show = false, 5000)"
-                >
-                    <div class="flex items-center gap-3">
-                        <i data-lucide="{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}alert-circle{% else %}help-circle{% endif %}" class="w-5 h-5"></i>
-                        <span class="text-sm font-medium">{{ message }}</span>
-                    </div>
-                    <button @click="show = false" class="text-slate-400 hover:text-slate-600 transition-colors">
-                        <i data-lucide="x" class="w-4 h-4"></i>
-                    </button>
-                </div>
-                {% endfor %}
-            </div>
-            {% endif %}
-
-            {% block content %}{% endblock %}
+        <!-- Page Content -->
+        <div class="page-content">
+          <!-- Messages -->
+          {% if messages %} {% for message in messages %}
+          <div
+            class="alert alert-{{ message.tags }}"
+            id="alert-{{ forloop.counter }}"
+          >
+            <span>{{ message }}</span>
+            <button class="alert-close" onclick="this.parentElement.remove()">
+              ✕
+            </button>
+          </div>
+          {% endfor %} {% endif %} {% block content %}{% endblock %}
         </div>
       </main>
     </div>
 
-    <!-- Lucide initialization -->
+    <!-- Sidebar overlay for mobile -->
+    <div
+      class="sidebar-overlay"
+      id="sidebarOverlay"
+      onclick="toggleSidebar()"
+    ></div>
+
     <script>
-      lucide.createIcons();
-      
-      // Re-run lucide on Alpine changes or dynamic content
-      document.addEventListener('alpine:initialized', () => {
-        lucide.createIcons();
+      function toggleSidebar() {
+        document.getElementById("sidebar").classList.toggle("open");
+      }
+
+      // Auto-dismiss alerts after 5 seconds
+      document.querySelectorAll(".alert").forEach((alert) => {
+        setTimeout(() => {
+          alert.style.opacity = "0";
+          alert.style.transform = "translateY(-10px)";
+          alert.style.transition = "all 0.3s ease";
+          setTimeout(() => alert.remove(), 300);
+        }, 5000);
       });
     </script>
-    
     {% block extra_js %}{% endblock %}
   </body>
 </html>
-
