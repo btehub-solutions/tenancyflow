@@ -79,18 +79,22 @@ import dj_database_url
 # Priorities: DATABASE_URL -> POSTGRES_URL -> Local SQLite
 database_url = os.environ.get('DATABASE_URL') or os.environ.get('POSTGRES_URL')
 
-# Sanitize: Vercel/Supabase strings sometimes come with extra quotes
 if database_url:
-    database_url = database_url.strip('"').strip("'")
+    # Clean string aggressively to prevent DSN option errors
+    database_url = database_url.strip().strip('"').strip("'").strip()
 
 if database_url and '://' in database_url:
     DATABASES = {
-        'default': dj_database_url.parse(database_url, conn_max_age=600, conn_health_checks=True)
+        'default': dj_database_url.config(
+            default=database_url,
+            conn_max_age=600,
+            conn_health_checks=True
+        )
     }
 else:
     # Use django-environ's built-in parser for standard env strings or file fallback
     DATABASES = {
-        'default': env.db('DATABASE_URL', default=f'sqlite:///{BASE_DIR}/db.sqlite3')
+        'default': env.db('DATABASE_URL', default=f'sqlite:///{BASE_DIR / "db.sqlite3"}')
     }
 
 
