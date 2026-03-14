@@ -75,29 +75,44 @@ WSGI_APPLICATION = 'tenancyflow.wsgi.application'
 
 import dj_database_url
 
-# Database configuration
-# Priorities: Environment Variable -> Local SQLite
-# Note: Vercel/Supabase integration provides POSTGRES_URL
-db_url = os.environ.get('DATABASE_URL') or os.environ.get('POSTGRES_URL')
-
-if db_url and '://' in db_url:
-    # Aggressively clean the URL string
-    db_url = db_url.strip().strip('"').strip("'").strip()
-    DATABASES = {
-        'default': dj_database_url.parse(
-            db_url,
-            conn_max_age=600,
-            conn_health_checks=True
-        )
-    }
-else:
-    # Fallback to local SQLite - construct explicitly to avoid empty env var issues
+# Database configuration - Production Grade for Vercel + Supabase
+# Try individual parameters first (most reliable), then URL, then SQLite fallback
+if os.environ.get('POSTGRES_HOST'):
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / "db.sqlite3",
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.environ.get('POSTGRES_DATABASE'),
+            'USER': os.environ.get('POSTGRES_USER'),
+            'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
+            'HOST': os.environ.get('POSTGRES_HOST'),
+            'PORT': os.environ.get('POSTGRES_PORT', '5432'),
+            'OPTIONS': {
+                'connect_timeout': 10,
+            },
+            'CONN_MAX_AGE': 600,
+            'CONN_HEALTH_CHECKS': True,
         }
     }
+else:
+    db_url = os.environ.get('DATABASE_URL') or os.environ.get('POSTGRES_URL')
+    if db_url and '://' in db_url:
+        import re
+        # Remove ALL whitespace and quotes (including hidden characters)
+        db_url = re.sub(r'\s+', '', db_url).strip('"').strip("'")
+        DATABASES = {
+            'default': dj_database_url.parse(
+                db_url,
+                conn_max_age=600,
+                conn_health_checks=True
+            )
+        }
+    else:
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': BASE_DIR / "db.sqlite3",
+            }
+        }
 
 
 # Password validation
