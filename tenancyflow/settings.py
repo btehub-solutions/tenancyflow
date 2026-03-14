@@ -75,44 +75,37 @@ WSGI_APPLICATION = 'tenancyflow.wsgi.application'
 
 import dj_database_url
 
-# Database configuration - Production Grade for Vercel + Supabase
-# Try individual parameters first (most reliable), then URL, then SQLite fallback
-if os.environ.get('POSTGRES_HOST'):
+# Database configuration - Final Production Fix
+# Vercel Build environment has restricted network access on port 5432 (direct)
+# We MUST use the Supabase Pooler (usually port 6543) and SSL mode.
+
+db_url = os.environ.get('POSTGRES_URL') or os.environ.get('DATABASE_URL')
+
+if db_url and '://' in db_url:
+    # Aggressively clean the URL
+    db_url = db_url.strip().strip('"').strip("'").strip()
+    
+    # Use dj_database_url but ensure we inject the correct production settings
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.environ.get('POSTGRES_DATABASE'),
-            'USER': os.environ.get('POSTGRES_USER'),
-            'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
-            'HOST': os.environ.get('POSTGRES_HOST'),
-            'PORT': os.environ.get('POSTGRES_PORT', '5432'),
-            'OPTIONS': {
-                'connect_timeout': 10,
-            },
-            'CONN_MAX_AGE': 600,
-            'CONN_HEALTH_CHECKS': True,
-        }
+        'default': dj_database_url.parse(
+            db_url,
+            conn_max_age=600,
+            conn_health_checks=True
+        )
+    }
+    
+    # Add SSL requirements for Supabase
+    DATABASES['default']['OPTIONS'] = {
+        'sslmode': 'require',
     }
 else:
-    db_url = os.environ.get('DATABASE_URL') or os.environ.get('POSTGRES_URL')
-    if db_url and '://' in db_url:
-        import re
-        # Remove ALL whitespace and quotes (including hidden characters)
-        db_url = re.sub(r'\s+', '', db_url).strip('"').strip("'")
-        DATABASES = {
-            'default': dj_database_url.parse(
-                db_url,
-                conn_max_age=600,
-                conn_health_checks=True
-            )
+    # Local fallback
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / "db.sqlite3",
         }
-    else:
-        DATABASES = {
-            'default': {
-                'ENGINE': 'django.db.backends.sqlite3',
-                'NAME': BASE_DIR / "db.sqlite3",
-            }
-        }
+    }
 
 
 # Password validation
