@@ -89,11 +89,9 @@ DATABASES = {
 # Use Postgres/Supabase if a database URL exists (required for Vercel)
 if db_url:
     import dj_database_url
-    DATABASES['default'] = dj_database_url.parse(
-        db_url,
-        conn_max_age=600,
-        conn_health_checks=True
-    )
+    DATABASES['default'] = dj_database_url.parse(db_url, conn_max_age=600)
+    DATABASES['default']['CONN_HEALTH_CHECKS'] = True
+    
     # Ensure options are set for SSL (Postgres)
     if 'postgres' in db_url or 'postgresql' in db_url:
         DATABASES['default'].setdefault('OPTIONS', {})
