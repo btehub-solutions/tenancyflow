@@ -76,12 +76,9 @@ WSGI_APPLICATION = 'tenancyflow.wsgi.application'
 import dj_database_url
 
 # Database configuration
-# Local (DEBUG=True) always uses SQLite to prevent connection issues
-if DEBUG:
-    # Aggressively remove these from the current process environment
-    os.environ.pop('DATABASE_URL', None)
-    os.environ.pop('POSTGRES_URL', None)
+db_url = os.environ.get('DATABASE_URL') or os.environ.get('POSTGRES_URL')
 
+# Default to SQLite for local development
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -89,16 +86,18 @@ DATABASES = {
     }
 }
 
-# Use Postgres/Supabase ONLY on production (if database URL exists)
-db_url = os.environ.get('DATABASE_URL') or os.environ.get('POSTGRES_URL')
-if not DEBUG and db_url:
+# Use Postgres/Supabase if a database URL exists (required for Vercel)
+if db_url:
     import dj_database_url
     DATABASES['default'] = dj_database_url.parse(
         db_url,
         conn_max_age=600,
         conn_health_checks=True
     )
-    DATABASES['default']['OPTIONS'] = {'sslmode': 'require'}
+    # Ensure options are set for SSL (Postgres)
+    if 'postgres' in db_url or 'postgresql' in db_url:
+        DATABASES['default'].setdefault('OPTIONS', {})
+        DATABASES['default']['OPTIONS']['sslmode'] = 'require'
 
 
 # Password validation
