@@ -1,87 +1,194 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full bg-white">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register | TenancyFlow</title>
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>">
+    <title>Get Started | TenancyFlow</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        primary: { 50: '#f0fdfa', 100: '#ccfbf1', 200: '#99f6e4', 300: '#5eead4', 400: '#2dd4bf', 500: '#14b8a6', 600: '#0d9488', 700: '#0f766e', 800: '#115e59', 900: '#134e4a' },
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        [x-cloak] { display: none !important; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+    </style>
 </head>
-<body>
-    <div class="auth-page">
-        <div class="auth-container" style="max-width: 520px;">
-            <div class="auth-card">
-                <div class="auth-brand">
-                    <div class="brand-icon">🏠</div>
-                    <h2>Create Your Account</h2>
-                    <p>Start managing your properties like a pro</p>
+<body class="h-full font-sans antialiased text-gray-900 overflow-hidden">
+    <div class="flex h-screen">
+        <!-- Left Side: Marketing Content -->
+        <div class="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-primary-900">
+            <!-- Animated decorative elements -->
+            <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-primary-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
+            <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-96 h-96 bg-emerald-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" style="animation-delay: 2s;"></div>
+            
+            <div class="relative z-10 flex flex-col justify-center px-16 xl:px-24 w-full">
+                <div class="flex items-center space-x-3 mb-12">
+                    <div class="w-12 h-12 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/20 shadow-xl">
+                        <i data-lucide="home" class="w-7 h-7 text-white"></i>
+                    </div>
+                    <span class="text-2xl font-black tracking-tighter text-white">Tenancy<span class="text-primary-400">Flow</span></span>
                 </div>
 
-                {% if form.errors %}
-                    <div class="alert alert-danger">
-                        <span>Please correct the errors below.</span>
-                    </div>
-                {% endif %}
+                <h1 class="text-5xl xl:text-6xl font-extrabold text-white tracking-tight leading-[1.1] mb-8">
+                    Scale your property <br/>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-emerald-300">portfolio effortlessly.</span>
+                </h1>
 
-                <form method="post" action="{% url 'accounts:register' %}">
+                <div class="space-y-8">
+                    <div class="flex items-start space-x-4">
+                        <div class="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 mt-1">
+                            <i data-lucide="check" class="w-4 h-4"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-white">Unified Dashboard</h3>
+                            <p class="text-primary-100/70 font-medium">Track payments, tenants, and properties in one premium view.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-4">
+                        <div class="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 mt-1">
+                            <i data-lucide="check" class="w-4 h-4"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-white">Automated Reporting</h3>
+                            <p class="text-primary-100/70 font-medium">Get monthly financial summaries delivered to your inbox.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-4">
+                        <div class="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 mt-1">
+                            <i data-lucide="check" class="w-4 h-4"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-white">Invite-Only Access</h3>
+                            <p class="text-primary-100/70 font-medium">Secure your agency workflow with role-based permissions.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-16 pt-16 border-t border-white/10">
+                    <p class="text-primary-100/50 text-sm font-medium">TRUSTED BY 500+ AGENCIES NATIONWIDE</p>
+                </div>
+            </div>
+
+            <!-- Subtle Grid Pattern -->
+            <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: radial-gradient(#fff 1px, transparent 1px); background-size: 30px 30px;"></div>
+        </div>
+
+        <!-- Right Side: Registration Form -->
+        <div class="w-full lg:w-1/2 flex flex-col justify-center px-6 sm:px-12 lg:px-20 xl:px-28 bg-gray-50 overflow-y-auto">
+            <div class="max-w-md w-full mx-auto py-12">
+                <div class="mb-10 text-center lg:text-left">
+                    <h2 class="text-3xl font-extrabold text-gray-900 tracking-tight">Create your account</h2>
+                    <p class="mt-3 text-gray-500 font-medium">Join TenancyFlow and start managing smarter today.</p>
+                </div>
+
+                <form method="post" action="{% url 'accounts:register' %}" class="space-y-5" x-data="{ loading: false }" @submit="loading = true">
                     {% csrf_token %}
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label" for="id_first_name">First Name</label>
-                            {{ form.first_name }}
-                            {% if form.first_name.errors %}<p class="form-error">{{ form.first_name.errors.0 }}</p>{% endif %}
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label" for="id_last_name">Last Name</label>
-                            {{ form.last_name }}
-                            {% if form.last_name.errors %}<p class="form-error">{{ form.last_name.errors.0 }}</p>{% endif %}
-                        </div>
+                    
+                    {% if form.errors %}
+                    <div class="p-4 bg-red-50 border border-red-100 rounded-2xl flex items-center text-red-700 text-sm font-semibold mb-6">
+                        <i data-lucide="alert-circle" class="w-5 h-5 mr-3 flex-shrink-0"></i>
+                        Please correct the errors indicated below.
                     </div>
-                    <div class="form-group">
-                        <label class="form-label" for="id_company_name">Company / Agency Name</label>
-                        {{ form.company_name }}
-                        {% if form.company_name.errors %}<p class="form-error">{{ form.company_name.errors.0 }}</p>{% endif %}
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label" for="id_email">Email Address</label>
-                            {{ form.email }}
-                            {% if form.email.errors %}<p class="form-error">{{ form.email.errors.0 }}</p>{% endif %}
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label" for="id_phone">Phone Number</label>
-                            {{ form.phone }}
-                            {% if form.phone.errors %}<p class="form-error">{{ form.phone.errors.0 }}</p>{% endif %}
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="id_username">Username</label>
-                        {{ form.username }}
-                        {% if form.username.errors %}<p class="form-error">{{ form.username.errors.0 }}</p>{% endif %}
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label" for="id_password1">Password</label>
-                            {{ form.password1 }}
-                            {% if form.password1.errors %}<p class="form-error">{{ form.password1.errors.0 }}</p>{% endif %}
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label" for="id_password2">Confirm Password</label>
-                            {{ form.password2 }}
-                            {% if form.password2.errors %}<p class="form-error">{{ form.password2.errors.0 }}</p>{% endif %}
-                        </div>
-                    </div>
-                    <button type="submit" class="btn btn-primary btn-lg" style="width: 100%;">
-                        Create Account →
-                    </button>
-                </form>
+                    {% endif %}
 
-                <div class="auth-footer">
-                    Already have an account? <a href="{% url 'accounts:login' %}">Sign in</a>
-                </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-1.5">
+                            <label class="block text-sm font-semibold text-gray-700">First Name</label>
+                            <input type="text" name="first_name" value="{{ form.first_name.value|default:'' }}" class="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all shadow-sm" placeholder="John">
+                            {% if form.first_name.errors %}<p class="text-[10px] text-red-600 font-bold mt-1 uppercase">{{ form.first_name.errors.0 }}</p>{% endif %}
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="block text-sm font-semibold text-gray-700">Last Name</label>
+                            <input type="text" name="last_name" value="{{ form.last_name.value|default:'' }}" class="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all shadow-sm" placeholder="Doe">
+                            {% if form.last_name.errors %}<p class="text-[10px] text-red-600 font-bold mt-1 uppercase">{{ form.last_name.errors.0 }}</p>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <label class="block text-sm font-semibold text-gray-700">Company / Agency Name</label>
+                        <input type="text" name="company_name" value="{{ form.company_name.value|default:'' }}" class="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all shadow-sm" placeholder="BTE Solutions">
+                        {% if form.company_name.errors %}<p class="text-[10px] text-red-600 font-bold mt-1 uppercase">{{ form.company_name.errors.0 }}</p>{% endif %}
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <label class="block text-sm font-semibold text-gray-700">Email Address</label>
+                        <input type="email" name="email" value="{{ form.email.value|default:'' }}" class="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all shadow-sm" placeholder="john@example.com">
+                        {% if form.email.errors %}<p class="text-[10px] text-red-600 font-bold mt-1 uppercase">{{ form.email.errors.0 }}</p>{% endif %}
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-1.5">
+                            <label class="block text-sm font-semibold text-gray-700">Username</label>
+                            <input type="text" name="username" value="{{ form.username.value|default:'' }}" class="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all shadow-sm" placeholder="johndoe">
+                            {% if form.username.errors %}<p class="text-[10px] text-red-600 font-bold mt-1 uppercase">{{ form.username.errors.0 }}</p>{% endif %}
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="block text-sm font-semibold text-gray-700">Phone</label>
+                            <input type="text" name="phone" value="{{ form.phone.value|default:'' }}" class="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all shadow-sm" placeholder="+234...">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-1.5">
+                            <label class="block text-sm font-semibold text-gray-700">Password</label>
+                            <input type="password" name="password1" class="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all shadow-sm">
+                            {% if form.password1.errors %}<p class="text-[10px] text-red-600 font-bold mt-1 uppercase">{{ form.password1.errors.0 }}</p>{% endif %}
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="block text-sm font-semibold text-gray-700">Confirm</label>
+                            <input type="password" name="password2" class="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all shadow-sm">
+                        </div>
+                    </div>
+
+                    <div class="pt-4">
+                        <button type="submit" 
+                            class="w-full flex items-center justify-center px-8 py-4 bg-primary-600 border border-transparent rounded-2xl text-base font-bold text-white hover:bg-primary-700 focus:outline-none focus:ring-4 focus:ring-primary-500/20 transition-all transform active:scale-[0.98] shadow-lg shadow-primary-500/25"
+                            :disabled="loading">
+                            <span x-show="!loading" class="flex items-center">Get Started Now <i data-lucide="arrow-right" class="w-5 h-5 ml-2"></i></span>
+                            <span x-show="loading" class="flex items-center" x-cloak>
+                                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                Creating Account...
+                            </span>
+                        </button>
+                    </div>
+
+                    <p class="text-center text-sm text-gray-500 font-medium pt-4">
+                        Already using TenancyFlow? 
+                        <a href="{% url 'accounts:login' %}" class="text-primary-600 hover:text-primary-700 font-bold transition-colors">Sign in here</a>
+                    </p>
+                </form>
+            </div>
+            
+            <!-- Footer -->
+            <div class="pb-12 text-center text-xs text-gray-400 font-medium">
+                &copy; 2026 TenancyFlow Inc. All rights reserved.
             </div>
         </div>
     </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
 </body>
 </html>

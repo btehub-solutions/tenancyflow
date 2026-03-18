@@ -1,0 +1,24 @@
+<div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm overflow-hidden flex flex-col">
+    {% if title %}
+    <div class="p-6 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
+        <h3 class="text-base font-bold text-gray-900 dark:text-white">{{ title }}</h3>
+        {% if action_url %}
+        <a href="{{ action_url }}" class="text-sm font-semibold text-primary-600 hover:text-primary-700 dark:text-primary-500 transition-colors">
+            {{ action_text|default:'View All' }}
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
+    <div class="flex-1 overflow-x-auto">
+        <table class="w-full text-sm text-left whitespace-nowrap">
+            <thead class="text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800/80 uppercase font-bold tracking-wider">
+                <!-- Expecting <tr> headers from implementing template via block/include logic -->
+                {{ thead|safe }}
+            </thead>
+            <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                <!-- Expecting <tr> rows from implementing template via block/include logic -->
+                {{ tbody|safe }}
+            </tbody>
+        </table>
+    </div>
+</div>

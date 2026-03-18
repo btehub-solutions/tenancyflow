@@ -5,88 +5,106 @@
 {% block page_subtitle %}{% if property %}Edit the details of {{ property.name }}{% else %}Fill in the property details below{% endif %}{% endblock %}
 
 {% block content %}
-<div class="card" style="max-width: 800px;">
-    <div class="card-header">
-        <h3 class="card-title">Property Details</h3>
-    </div>
-    <div class="card-body">
-        <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            
-            <div class="form-group">
-                <label class="form-label">Property Name *</label>
-                {{ form.name }}
-                {% if form.name.errors %}<p class="form-error">{{ form.name.errors.0 }}</p>{% endif %}
+<div class="max-w-4xl">
+    <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm overflow-hidden">
+        <div class="p-6 sm:p-8 border-b border-gray-100 dark:border-gray-800 flex items-center bg-gray-50/50 dark:bg-gray-800/30">
+            <div class="w-10 h-10 bg-primary-50 dark:bg-primary-900/40 rounded-xl flex items-center justify-center text-primary-600 dark:text-primary-400 mr-4 shadow-sm border border-primary-100 dark:border-primary-800">
+                <i data-lucide="building" class="w-5 h-5"></i>
             </div>
-
-            <div class="form-group">
-                <label class="form-label">Address *</label>
-                {{ form.address }}
-                {% if form.address.errors %}<p class="form-error">{{ form.address.errors.0 }}</p>{% endif %}
+            <div>
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Property Information</h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Basic details about the real estate unit</p>
             </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label">City</label>
-                    {{ form.city }}
+        </div>
+        
+        <div class="p-6 sm:p-8">
+            <form method="post" enctype="multipart/form-data" class="space-y-6">
+                {% csrf_token %}
+                
+                <div class="space-y-1.5 focus-within:text-primary-600 transition-colors">
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Property Name *</label>
+                    {{ form.name }}
+                    {% if form.name.errors %}<p class="text-xs text-danger font-medium mt-1">{{ form.name.errors.0 }}</p>{% endif %}
                 </div>
-                <div class="form-group">
-                    <label class="form-label">State</label>
-                    {{ form.state }}
+
+                <div class="space-y-1.5">
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Address *</label>
+                    {{ form.address }}
+                    {% if form.address.errors %}<p class="text-xs text-danger font-medium mt-1">{{ form.address.errors.0 }}</p>{% endif %}
                 </div>
-            </div>
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label">Property Type</label>
-                    {{ form.property_type }}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-1.5">
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">City</label>
+                        {{ form.city }}
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">State</label>
+                        {{ form.state }}
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Status</label>
-                    {{ form.status }}
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="space-y-1.5">
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Property Type</label>
+                        {{ form.property_type }}
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Status</label>
+                        {{ form.status }}
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Total Units (Flats/Rooms)</label>
+                        {{ form.total_units }}
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Total Units (Flats/Rooms)</label>
-                    {{ form.total_units }}
+
+                <div class="relative py-4">
+                    <div class="absolute inset-0 flex items-center" aria-hidden="true">
+                        <div class="w-full border-t border-gray-200 dark:border-gray-700"></div>
+                    </div>
+                    <div class="relative flex justify-start">
+                        <span class="pr-3 bg-white dark:bg-gray-900 text-sm font-semibold text-gray-900 dark:text-white flex items-center">
+                            <i data-lucide="user-square-2" class="w-4 h-4 mr-2 text-primary-500"></i> Landlord Information
+                        </span>
+                    </div>
                 </div>
-            </div>
 
-            <hr style="border: none; border-top: 1px solid var(--gray-200); margin: var(--space-xl) 0;">
-            <h4 style="font-size: 0.9rem; font-weight: 700; color: var(--gray-700); margin-bottom: var(--space-lg);">Landlord Information</h4>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label">Landlord Name</label>
-                    {{ form.landlord_name }}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-1.5">
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Landlord Name</label>
+                        {{ form.landlord_name }}
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Landlord Phone</label>
+                        {{ form.landlord_phone }}
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Landlord Phone</label>
-                    {{ form.landlord_phone }}
+
+                <div class="space-y-1.5">
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Landlord Email</label>
+                    {{ form.landlord_email }}
                 </div>
-            </div>
 
-            <div class="form-group">
-                <label class="form-label">Landlord Email</label>
-                {{ form.landlord_email }}
-            </div>
+                <div class="space-y-1.5">
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Description</label>
+                    {{ form.description }}
+                </div>
 
-            <div class="form-group">
-                <label class="form-label">Description</label>
-                {{ form.description }}
-            </div>
+                <div class="space-y-1.5 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-dashed border-gray-300 dark:border-gray-700">
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2"><i data-lucide="image" class="w-4 h-4 inline mr-1"></i> Property Image</label>
+                    {{ form.image }}
+                </div>
 
-            <div class="form-group">
-                <label class="form-label">Property Image</label>
-                {{ form.image }}
-            </div>
-
-            <div style="display: flex; gap: var(--space-md); margin-top: var(--space-xl);">
-                <button type="submit" class="btn btn-primary">
-                    {% if property %}Save Changes{% else %}Add Property{% endif %}
-                </button>
-                <a href="{% url 'properties:list' %}" class="btn btn-secondary">Cancel</a>
-            </div>
-        </form>
+                <div class="pt-6 border-t border-gray-100 dark:border-gray-800 flex items-center justify-end space-x-4">
+                    <a href="{% url 'properties:list' %}" class="px-5 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">Cancel</a>
+                    <button type="submit" class="inline-flex items-center px-6 py-2.5 bg-primary-600 hover:bg-primary-700 text-white text-sm font-bold rounded-xl shadow-lg shadow-primary-500/30 transition-all transform active:scale-95">
+                        <i data-lucide="save" class="w-4 h-4 mr-2"></i>
+                        {% if property %}Save Changes{% else %}Add Property{% endif %}
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 {% endblock %}

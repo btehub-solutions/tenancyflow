@@ -1,68 +1,90 @@
 {% extends 'base.html' %}
+{% load humanize %}
 
 {% block title %}{{ title }}{% endblock %}
 {% block page_title %}{{ title }}{% endblock %}
-{% block page_subtitle %}Record a new payment from a tenant{% endblock %}
+{% block page_subtitle %}Record a new financial transaction for a tenant{% endblock %}
 
 {% block content %}
-<div class="card" style="max-width: 700px;">
-    <div class="card-header">
-        <h3 class="card-title">Payment Details</h3>
-    </div>
-    <div class="card-body">
-        <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            
-            <div class="form-group">
-                <label class="form-label">Tenant *</label>
-                {{ form.tenant }}
-                {% if form.tenant.errors %}<p class="form-error">{{ form.tenant.errors.0 }}</p>{% endif %}
+<div class="max-w-3xl">
+    <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm overflow-hidden">
+        <div class="p-6 sm:p-8 border-b border-gray-100 dark:border-gray-800 flex items-center bg-gray-50/50 dark:bg-gray-800/30">
+            <div class="w-10 h-10 bg-success/10 rounded-xl flex items-center justify-center text-success mr-4 shadow-sm border border-success/20">
+                <i data-lucide="banknote" class="w-5 h-5"></i>
             </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label">Amount (₦) *</label>
-                    {{ form.amount }}
-                    {% if form.amount.errors %}<p class="form-error">{{ form.amount.errors.0 }}</p>{% endif %}
+            <div>
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Payment Details</h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Ensure all fields are accurate for reporting</p>
+            </div>
+        </div>
+        
+        <div class="p-6 sm:p-8">
+            <form method="post" enctype="multipart/form-data" class="space-y-6">
+                {% csrf_token %}
+                
+                <div class="space-y-1.5 focus-within:text-primary-600 transition-colors">
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Tenant *</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400"><i data-lucide="user" class="w-4 h-4"></i></div>
+                        <div class="[&>select]:pl-9">
+                            {{ form.tenant }}
+                        </div>
+                    </div>
+                    {% if form.tenant.errors %}<p class="text-xs text-danger font-medium mt-1">{{ form.tenant.errors.0 }}</p>{% endif %}
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Payment Date *</label>
-                    {{ form.payment_date }}
-                    {% if form.payment_date.errors %}<p class="form-error">{{ form.payment_date.errors.0 }}</p>{% endif %}
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-1.5">
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Amount (₦) *</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 font-bold text-xs">₦</div>
+                            <div class="[&>input]:pl-8">
+                                {{ form.amount }}
+                            </div>
+                        </div>
+                        {% if form.amount.errors %}<p class="text-xs text-danger font-medium mt-1">{{ form.amount.errors.0 }}</p>{% endif %}
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Payment Date *</label>
+                        {{ form.payment_date }}
+                        {% if form.payment_date.errors %}<p class="text-xs text-danger font-medium mt-1">{{ form.payment_date.errors.0 }}</p>{% endif %}
+                    </div>
                 </div>
-            </div>
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label">Payment Method</label>
-                    {{ form.payment_method }}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-1.5">
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Payment Method</label>
+                        {{ form.payment_method }}
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Status</label>
+                        {{ form.status }}
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Status</label>
-                    {{ form.status }}
+
+                <div class="space-y-1.5">
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Reference / Receipt Number</label>
+                    {{ form.reference }}
                 </div>
-            </div>
 
-            <div class="form-group">
-                <label class="form-label">Reference / Receipt Number</label>
-                {{ form.reference }}
-            </div>
+                <div class="space-y-1.5">
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Description</label>
+                    {{ form.description }}
+                </div>
 
-            <div class="form-group">
-                <label class="form-label">Description</label>
-                {{ form.description }}
-            </div>
+                <div class="space-y-1.5 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-dashed border-gray-300 dark:border-gray-700">
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2"><i data-lucide="paperclip" class="w-4 h-4 inline mr-1"></i> Receipt Image (Optional)</label>
+                    {{ form.receipt_image }}
+                </div>
 
-            <div class="form-group">
-                <label class="form-label">Receipt Image</label>
-                {{ form.receipt_image }}
-            </div>
-
-            <div style="display: flex; gap: var(--space-md); margin-top: var(--space-xl);">
-                <button type="submit" class="btn btn-success">💰 Record Payment</button>
-                <a href="{% url 'payments:list' %}" class="btn btn-secondary">Cancel</a>
-            </div>
-        </form>
+                <div class="pt-6 border-t border-gray-100 dark:border-gray-800 flex items-center justify-end space-x-4">
+                    <a href="{% url 'payments:list' %}" class="px-5 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">Cancel</a>
+                    <button type="submit" class="inline-flex items-center px-6 py-2.5 bg-success hover:bg-success/90 text-white text-sm font-bold rounded-xl shadow-lg shadow-success/30 transition-all transform active:scale-95">
+                        <i data-lucide="check-circle" class="w-4 h-4 mr-2"></i> Record Payment
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 {% endblock %}

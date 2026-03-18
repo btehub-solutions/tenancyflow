@@ -6,171 +6,194 @@
 {% block page_subtitle %}{{ tenant.flat_or_room }} at {{ tenant.building.name }}{% endblock %}
 
 {% block page_actions %}
-<div style="display: flex; gap: var(--space-sm);">
-    <a href="{% url 'payments:create' %}?tenant={{ tenant.pk }}" class="btn btn-success">💰 Record Payment</a>
-    <a href="{% url 'tenants:update' pk=tenant.pk %}" class="btn btn-secondary">✏️ Edit</a>
-    <a href="{% url 'tenants:delete' pk=tenant.pk %}" class="btn btn-danger btn-sm">🗑️</a>
+<div class="flex items-center space-x-2">
+    <a href="{% url 'payments:create' %}?tenant={{ tenant.pk }}" class="inline-flex items-center px-4 py-2 bg-success hover:bg-success/90 text-white text-sm font-semibold rounded-xl shadow-lg shadow-success/30 transition-all transform active:scale-95">
+        <i data-lucide="banknote" class="w-4 h-4 mr-2"></i> Record Payment
+    </a>
+    <a href="{% url 'tenants:update' pk=tenant.pk %}" class="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-sm font-semibold rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+        <i data-lucide="edit-3" class="w-4 h-4 mr-2"></i> Edit
+    </a>
+    <a href="{% url 'tenants:delete' pk=tenant.pk %}" class="inline-flex items-center p-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-danger hover:bg-danger/5 rounded-xl transition-colors">
+        <i data-lucide="trash-2" class="w-4 h-4"></i>
+    </a>
 </div>
 {% endblock %}
 
 {% block content %}
-<!-- Financial Summary Stats -->
-<div class="stats-grid">
-    <div class="stat-card">
-        <div class="stat-icon accent">💵</div>
-        <div class="stat-value">₦{{ tenant.rent_amount|intcomma }}</div>
-        <div class="stat-label">Rent Amount</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-icon info">📋</div>
-        <div class="stat-value">₦{{ tenant.total_due|intcomma }}</div>
-        <div class="stat-label">Total Due</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-icon success">✅</div>
-        <div class="stat-value">₦{{ tenant.total_paid|intcomma }}</div>
-        <div class="stat-label">Total Paid</div>
-    </div>
-    <div class="stat-card {% if tenant.balance > 0 %}danger{% endif %}">
-        <div class="stat-icon {% if tenant.balance > 0 %}danger{% else %}success{% endif %}">
-            {% if tenant.balance > 0 %}⚠️{% else %}🎉{% endif %}
-        </div>
-        <div class="stat-value">₦{{ tenant.balance|intcomma }}</div>
-        <div class="stat-label">Outstanding Balance</div>
-    </div>
-</div>
-
-<!-- Tenant Details -->
-<div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-xl);">
-    <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">Personal Details</h3>
-        </div>
-        <div class="card-body">
-            <div class="detail-info-grid" style="grid-template-columns: 1fr;">
-                <div class="detail-info-item">
-                    <div class="detail-info-label">Full Name</div>
-                    <div class="detail-info-value">{{ tenant.name }}</div>
-                </div>
-                <div class="detail-info-item">
-                    <div class="detail-info-label">Phone</div>
-                    <div class="detail-info-value">{{ tenant.phone|default:"Not provided" }}</div>
-                </div>
-                <div class="detail-info-item">
-                    <div class="detail-info-label">Email</div>
-                    <div class="detail-info-value">{{ tenant.email|default:"Not provided" }}</div>
-                </div>
-                <div class="detail-info-item">
-                    <div class="detail-info-label">Status</div>
-                    <div class="detail-info-value">
-                        {% if tenant.is_active %}
-                            <span class="badge badge-success">Active</span>
-                        {% else %}
-                            <span class="badge badge-gray">Inactive</span>
-                        {% endif %}
-                    </div>
-                </div>
-                {% if tenant.emergency_contact_name %}
-                <div class="detail-info-item">
-                    <div class="detail-info-label">Emergency Contact</div>
-                    <div class="detail-info-value">{{ tenant.emergency_contact_name }} ({{ tenant.emergency_contact_phone }})</div>
-                </div>
-                {% endif %}
-                {% if tenant.remarks %}
-                <div class="detail-info-item">
-                    <div class="detail-info-label">Remarks</div>
-                    <div class="detail-info-value">{{ tenant.remarks }}</div>
-                </div>
-                {% endif %}
-            </div>
-        </div>
+<div class="space-y-6">
+    <!-- Financial Summary Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {% include 'components/stat_card.html' with title="Rent Amount" value="₦"|add:tenant.rent_amount|intcomma icon="coins" color="primary" %}
+        {% include 'components/stat_card.html' with title="Total Due" value="₦"|add:tenant.total_due|intcomma icon="file-text" color="info" %}
+        {% include 'components/stat_card.html' with title="Total Paid" value="₦"|add:tenant.total_paid|intcomma icon="check-square" color="success" %}
+        {% include 'components/stat_card.html' with title="Outstanding Balance" value="₦"|add:tenant.balance|intcomma icon="alert-circle" color=tenant.balance|yesno:"danger,success" %}
     </div>
 
-    <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">Tenancy & Financial</h3>
-        </div>
-        <div class="card-body">
-            <div class="detail-info-grid" style="grid-template-columns: 1fr;">
-                <div class="detail-info-item">
-                    <div class="detail-info-label">Property</div>
-                    <div class="detail-info-value">
-                        <a href="{% url 'properties:detail' pk=tenant.building.pk %}">{{ tenant.building.name }}</a>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Main: Information Panels -->
+        <div class="lg:col-span-2 space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Personal Details -->
+                <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm overflow-hidden">
+                    <div class="p-5 border-b border-gray-100 dark:border-gray-800 flex items-center">
+                        <i data-lucide="user" class="w-4 h-4 text-primary-500 mr-2"></i>
+                        <h4 class="font-bold text-gray-900 dark:text-white">Personal Details</h4>
+                    </div>
+                    <div class="p-5 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Phone</span>
+                            <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ tenant.phone|default:"—" }}</span>
+                        </div>
+                        <div class="flex items-center justify-between border-t border-gray-50 dark:border-gray-800/50 pt-4">
+                            <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Email</span>
+                            <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ tenant.email|default:"—" }}</span>
+                        </div>
+                        <div class="flex items-center justify-between border-t border-gray-50 dark:border-gray-800/50 pt-4">
+                            <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Status</span>
+                            {% if tenant.is_active %}
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide bg-success/10 text-success border border-success/20"> Active </span>
+                            {% else %}
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700"> Inactive </span>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
-                <div class="detail-info-item">
-                    <div class="detail-info-label">Flat / Room</div>
-                    <div class="detail-info-value">{{ tenant.flat_or_room }}</div>
-                </div>
-                <div class="detail-info-item">
-                    <div class="detail-info-label">Agreement Fee</div>
-                    <div class="detail-info-value">₦{{ tenant.agreement_fee|intcomma }}</div>
-                </div>
-                <div class="detail-info-item">
-                    <div class="detail-info-label">Caution Fee</div>
-                    <div class="detail-info-value">₦{{ tenant.caution_fee|intcomma }}</div>
-                </div>
-                <div class="detail-info-item">
-                    <div class="detail-info-label">Tenancy Period</div>
-                    <div class="detail-info-value">
-                        {% if tenant.tenancy_start and tenant.tenancy_end %}
-                            {{ tenant.tenancy_start|date:"M d, Y" }} — {{ tenant.tenancy_end|date:"M d, Y" }}
-                        {% else %}
-                            Not set
-                        {% endif %}
+
+                <!-- Tenancy & Financial -->
+                <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm overflow-hidden">
+                    <div class="p-5 border-b border-gray-100 dark:border-gray-800 flex items-center">
+                        <i data-lucide="file-spreadsheet" class="w-4 h-4 text-primary-500 mr-2"></i>
+                        <h4 class="font-bold text-gray-900 dark:text-white">Tenancy Contract</h4>
+                    </div>
+                    <div class="p-5 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Property</span>
+                            <a href="{% url 'properties:detail' pk=tenant.building.pk %}" class="text-sm font-semibold text-primary-600 hover:text-primary-700 transition-colors">{{ tenant.building.name }}</a>
+                        </div>
+                        <div class="flex items-center justify-between border-t border-gray-50 dark:border-gray-800/50 pt-4">
+                            <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Room/Flat</span>
+                            <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ tenant.flat_or_room }}</span>
+                        </div>
+                        <div class="flex items-center justify-between border-t border-gray-50 dark:border-gray-800/50 pt-4">
+                            <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Lease Period</span>
+                            <span class="text-sm font-semibold text-gray-900 dark:text-white">
+                                {% if tenant.tenancy_start %}{{ tenant.tenancy_start|date:"M d, Y" }}{% else %}—{% endif %} 
+                                <span class="text-gray-400 mx-1">→</span> 
+                                {% if tenant.tenancy_end %}{{ tenant.tenancy_end|date:"M d, Y" }}{% else %}—{% endif %}
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-</div>
 
-<!-- Payment History -->
-<div class="card" style="margin-top: var(--space-xl);">
-    <div class="card-header">
-        <h3 class="card-title">Payment History</h3>
-        <a href="{% url 'payments:create' %}?tenant={{ tenant.pk }}" class="btn btn-sm btn-success">+ Record Payment</a>
-    </div>
-    {% if payments %}
-    <div class="table-container" style="border: none; border-radius: 0;">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Amount</th>
-                    <th>Method</th>
-                    <th>Reference</th>
-                    <th>Status</th>
-                    <th>Recorded By</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for payment in payments %}
-                <tr>
-                    <td>{{ payment.payment_date|date:"M d, Y" }}</td>
-                    <td><strong>₦{{ payment.amount|intcomma }}</strong></td>
-                    <td>{{ payment.get_payment_method_display }}</td>
-                    <td>{{ payment.reference|default:"-" }}</td>
-                    <td>
-                        <span class="badge {% if payment.status == 'confirmed' %}badge-success{% elif payment.status == 'pending' %}badge-warning{% else %}badge-danger{% endif %}">
-                            {{ payment.get_status_display }}
-                        </span>
-                    </td>
-                    <td>{{ payment.recorded_by|default:"-" }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    {% else %}
-    <div class="card-body">
-        <div class="empty-state">
-            <div class="empty-state-icon">💳</div>
-            <h3>No payments recorded</h3>
-            <p>Record the first payment for this tenant.</p>
-            <a href="{% url 'payments:create' %}?tenant={{ tenant.pk }}" class="btn btn-success">💰 Record Payment</a>
+            <!-- Payment History Table -->
+            <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm overflow-hidden flex flex-col">
+                <div class="p-6 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">Payment History</h3>
+                    <a href="{% url 'payments:create' %}?tenant={{ tenant.pk }}" class="text-sm font-semibold text-primary-600 hover:text-primary-700 transition-colors flex items-center">
+                        Add Record <i data-lucide="plus" class="w-4 h-4 ml-1"></i>
+                    </a>
+                </div>
+                
+                <div class="flex-1 overflow-x-auto">
+                    {% if payments %}
+                    <table class="w-full text-sm text-left whitespace-nowrap">
+                        <thead class="text-xs text-gray-500 dark:text-gray-400 bg-gray-50/80 dark:bg-gray-800/80 uppercase font-bold tracking-wider">
+                            <tr>
+                                <th scope="col" class="px-6 py-4">Date</th>
+                                <th scope="col" class="px-6 py-4">Amount</th>
+                                <th scope="col" class="px-6 py-4">Method</th>
+                                <th scope="col" class="px-6 py-4">Status</th>
+                                <th scope="col" class="px-6 py-4 text-right">Reference</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                            {% for payment in payments %}
+                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                                <td class="px-6 py-4 text-gray-500 dark:text-gray-400 font-medium">{{ payment.payment_date|date:"M d, Y" }}</td>
+                                <td class="px-6 py-4 font-bold text-gray-900 dark:text-gray-100">₦{{ payment.amount|intcomma }}</td>
+                                <td class="px-6 py-4 text-gray-500 dark:text-gray-400">{{ payment.get_payment_method_display }}</td>
+                                <td class="px-6 py-4">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide 
+                                        {% if payment.status == 'confirmed' %}bg-success/10 text-success border border-success/20{% elif payment.status == 'pending' %}bg-warning/10 text-warning border border-warning/20{% else %}bg-danger/10 text-danger border border-danger/20{% endif %}">
+                                        {{ payment.get_status_display }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 text-right font-mono text-xs text-gray-400">{{ payment.reference|default:"—" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <div class="p-12 text-center">
+                        <div class="w-12 h-12 bg-gray-50 dark:bg-gray-800 rounded-full flex items-center justify-center text-gray-400 mx-auto mb-3">
+                            <i data-lucide="receipt" class="w-6 h-6"></i>
+                        </div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">No payments recorded for this tenant.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar: Extra Info -->
+        <div class="space-y-6">
+            <!-- Emergency Contact Card -->
+            {% if tenant.emergency_contact_name %}
+            <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm overflow-hidden border-l-4 border-l-danger">
+                <div class="p-5">
+                    <h4 class="font-bold text-gray-900 dark:text-white flex items-center mb-4">
+                        <i data-lucide="life-buoy" class="w-4 h-4 text-danger mr-2"></i> Emergency Contact
+                    </h4>
+                    <div class="space-y-3">
+                        <div>
+                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Name</p>
+                            <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ tenant.emergency_contact_name }}</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Phone</p>
+                            <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ tenant.emergency_contact_phone }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Extra Fees -->
+            <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm p-5">
+                <h4 class="font-bold text-gray-900 dark:text-white mb-4">Additional Fees</h4>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 rounded-lg bg-primary-50 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 mr-3">
+                                <i data-lucide="file-text" class="w-4 h-4"></i>
+                            </div>
+                            <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Agreement</span>
+                        </div>
+                        <span class="text-sm font-bold text-gray-900 dark:text-white">₦{{ tenant.agreement_fee|intcomma }}</span>
+                    </div>
+                    <div class="flex items-center justify-between border-t border-gray-50 dark:border-gray-800/50 pt-4">
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 rounded-lg bg-info-50 dark:bg-info-900/30 flex items-center justify-center text-info-600 mr-3">
+                                <i data-lucide="shield-check" class="w-4 h-4"></i>
+                            </div>
+                            <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Caution</span>
+                        </div>
+                        <span class="text-sm font-bold text-gray-900 dark:text-white">₦{{ tenant.caution_fee|intcomma }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Remarks -->
+            {% if tenant.remarks %}
+            <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm p-5">
+                <h4 class="font-bold text-gray-900 dark:text-white mb-2">Internal Remarks</h4>
+                <p class="text-sm text-gray-500 dark:text-gray-400 leading-relaxed font-medium italic">
+                    "{{ tenant.remarks }}"
+                </p>
+            </div>
+            {% endif %}
         </div>
     </div>
-    {% endif %}
 </div>
 {% endblock %}

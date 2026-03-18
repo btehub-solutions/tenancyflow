@@ -1,0 +1,86 @@
+<!-- Sidebar Component -->
+<aside x-data="{ expanded: true }" :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
+    class="fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 transition-transform duration-300 ease-in-out flex flex-col">
+    
+    <!-- Brand -->
+    <div class="h-16 flex items-center px-6 border-b border-gray-100 dark:border-gray-800">
+        <div class="flex items-center space-x-3 text-primary-600 dark:text-primary-500">
+            <div class="w-8 h-8 rounded-lg bg-primary-50 dark:bg-primary-900/40 flex items-center justify-center">
+                <i data-lucide="building-2" class="w-5 h-5"></i>
+            </div>
+            <span class="text-xl font-bold tracking-tight text-gray-900 dark:text-white">TenancyFlow</span>
+        </div>
+        <!-- Mobile close button -->
+        <button @click="sidebarOpen = false" class="lg:hidden ml-auto p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+            <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="flex-1 px-4 py-6 space-y-1 overflow-y-auto" x-data="{ currentPath: '{{ request.resolver_match.app_name }}' }">
+        <div class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-4 px-2">Main</div>
+        
+        <a href="{% url 'dashboard:index' %}" 
+           class="flex items-center px-3 py-2.5 rounded-xl font-medium transition-colors group relative"
+           :class="currentPath === 'dashboard' ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800/50 hover:text-gray-900 dark:hover:text-gray-200'">
+            <i data-lucide="layout-dashboard" class="w-5 h-5 mr-3" :class="currentPath === 'dashboard' ? 'text-primary-600 dark:text-primary-500' : 'text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300'"></i>
+            Dashboard
+            <div x-show="currentPath === 'dashboard'" class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-primary-600 dark:bg-primary-500 rounded-r-full"></div>
+        </a>
+
+        <div class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mt-8 mb-4 px-2">Management</div>
+        
+        <a href="{% url 'properties:list' %}"
+           class="flex items-center px-3 py-2.5 rounded-xl font-medium transition-colors group relative"
+           :class="currentPath === 'properties' ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800/50 hover:text-gray-900 dark:hover:text-gray-200'">
+            <i data-lucide="building" class="w-5 h-5 mr-3" :class="currentPath === 'properties' ? 'text-primary-600 dark:text-primary-500' : 'text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300'"></i>
+            Properties
+        </a>
+
+        <a href="{% url 'tenants:list' %}"
+           class="flex items-center px-3 py-2.5 rounded-xl font-medium transition-colors group relative"
+           :class="currentPath === 'tenants' ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800/50 hover:text-gray-900 dark:hover:text-gray-200'">
+            <i data-lucide="users" class="w-5 h-5 mr-3" :class="currentPath === 'tenants' ? 'text-primary-600 dark:text-primary-500' : 'text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300'"></i>
+            Tenants
+        </a>
+
+        <a href="{% url 'payments:list' %}"
+           class="flex items-center px-3 py-2.5 rounded-xl font-medium transition-colors group relative"
+           :class="currentPath === 'payments' ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800/50 hover:text-gray-900 dark:hover:text-gray-200'">
+            <i data-lucide="wallet" class="w-5 h-5 mr-3" :class="currentPath === 'payments' ? 'text-primary-600 dark:text-primary-500' : 'text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300'"></i>
+            Payments
+        </a>
+        
+
+        <div class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mt-8 mb-4 px-2">Account</div>
+        
+        <a href="{% url 'accounts:profile' %}"
+           class="flex items-center px-3 py-2.5 rounded-xl font-medium transition-colors group relative"
+           :class="'{{ request.resolver_match.url_name }}' === 'profile' ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800/50 hover:text-gray-900 dark:hover:text-gray-200'">
+            <i data-lucide="settings" class="w-5 h-5 mr-3 text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300"></i>
+            Settings
+        </a>
+
+        {% if request.user.is_superuser %}
+        <a href="{% url 'accounts:invite_agent' %}"
+           class="flex items-center px-3 py-2.5 rounded-xl font-medium transition-colors group relative text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800/50 hover:text-gray-900 dark:hover:text-gray-200">
+            <i data-lucide="mail-plus" class="w-5 h-5 mr-3 text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300"></i>
+            Invite Agent
+        </a>
+        {% endif %}
+    </nav>
+
+    <!-- User Footer -->
+    <div class="p-4 border-t border-gray-100 dark:border-gray-800">
+        <a href="{% url 'accounts:profile' %}" class="flex items-center w-full p-2 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors group">
+            <div class="h-9 w-9 rounded-full bg-gradient-to-tr from-primary-500 to-primary-600 flex items-center justify-center text-white font-bold text-sm shadow-sm">
+                {{ request.user.username|make_list|first|upper }}
+            </div>
+            <div class="ml-3 truncate">
+                <p class="text-sm font-semibold text-gray-900 dark:text-white truncate">{{ request.user.get_full_name|default:request.user.username }}</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ request.user.company_name|default:"Agent" }}</p>
+            </div>
+            <i data-lucide="more-vertical" class="w-4 h-4 ml-auto text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+        </a>
+    </div>
+</aside>

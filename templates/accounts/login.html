@@ -1,303 +1,183 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="antialiased">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Login{% endblock %} | TenancyFlow</title>
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>">
-    <style>
-        :root {
-            --primary: #4F46E5;
-            --primary-hover: #4338CA;
-            --bg-color: #f3f4f6;
-            --text-main: #111827;
-            --text-muted: #6b7280;
-            --card-bg: rgba(255, 255, 255, 0.85);
-            --card-border: rgba(255, 255, 255, 0.4);
-            --success: #10B981;
-            --danger: #EF4444;
-            --input-border: #D1D5DB;
-            --input-focus: #4F46E5;
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-glass: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Inter', sans-serif;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.15) 0, transparent 50%), 
-                radial-gradient(at 50% 0%, rgba(16, 185, 129, 0.1) 0, transparent 50%), 
-                radial-gradient(at 100% 0%, rgba(236, 72, 153, 0.15) 0, transparent 50%);
-            background-attachment: fixed;
-            background-size: cover;
-            background-position: center;
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1.5rem;
-            animation: fadeIn 1s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes slideUp {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        .auth-container {
-            width: 100%;
-            max-width: 440px;
-        }
-
-        .auth-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--card-border);
-            border-radius: 24px;
-            padding: 3rem 2.5rem;
-            box-shadow: var(--shadow-glass);
-            animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .auth-brand {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .brand-icon {
-            font-size: 3.5rem;
-            line-height: 1;
-            margin-bottom: 1rem;
-            display: inline-block;
-            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
-            animation: bounce 3s infinite ease-in-out;
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-8px); }
-        }
-
-        .auth-brand h2 {
-            font-size: 1.85rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            color: #1f2937;
-            letter-spacing: -0.025em;
-        }
-
-        .auth-brand p {
-            color: var(--text-muted);
-            font-size: 0.95rem;
-        }
-
-        .alert-danger {
-            background-color: #FEF2F2;
-            border-left: 4px solid var(--danger);
-            color: #B91C1C;
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1.5rem;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            animation: slideUp 0.4s ease-out;
-        }
-
-        .form-group {
-            margin-bottom: 1.25rem;
-            text-align: left;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: #374151;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 0.875rem 1rem;
-            border: 1px solid var(--input-border);
-            border-radius: 12px;
-            font-size: 1rem;
-            transition: all 0.2s ease;
-            background-color: rgba(255, 255, 255, 0.9);
-            box-shadow: var(--shadow-sm);
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: var(--input-focus);
-            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15);
-            background-color: #fff;
-        }
-
-        .form-input::placeholder {
-            color: #9CA3AF;
-        }
-
-        .btn-primary {
-            width: 100%;
-            background: linear-gradient(135deg, var(--primary), var(--primary-hover));
-            color: white;
-            border: none;
-            padding: 0.875rem 1.5rem;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3), 0 2px 4px -1px rgba(79, 70, 229, 0.2);
-            margin-top: 0.75rem;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.4), 0 4px 6px -2px rgba(79, 70, 229, 0.2);
-        }
-
-        .btn-primary:active {
-            transform: translateY(0);
-        }
-
-        .btn-primary .arrow {
-            margin-left: 0.5rem;
-            transition: transform 0.2s ease;
-        }
-
-        .btn-primary:hover .arrow {
-            transform: translateX(4px);
-        }
-
-        .auth-footer {
-            margin-top: 2rem;
-            text-align: center;
-            padding-top: 1.5rem;
-            border-top: 1px solid rgba(0,0,0,0.05);
-            font-size: 0.875rem;
-            color: var(--text-muted);
-        }
-
-        .auth-footer a {
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.2s;
-            display: inline-block;
-            margin-top: 0.25rem;
-        }
-
-        .auth-footer a:hover {
-            color: var(--primary-hover);
-            text-decoration: underline;
-        }
-
-        /* Dark mode compatibility */
-        @media (prefers-color-scheme: dark) {
-            body {
-                background-color: #111827;
-                background-image: 
-                    radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.15) 0, transparent 50%), 
-                    radial-gradient(at 50% 0%, rgba(16, 185, 129, 0.05) 0, transparent 50%), 
-                    radial-gradient(at 100% 0%, rgba(236, 72, 153, 0.1) 0, transparent 50%);
-            }
-            .auth-card {
-                background: rgba(31, 41, 55, 0.65);
-                border-color: rgba(255, 255, 255, 0.08);
-            }
-            .auth-brand h2 {
-                color: #F9FAFB;
-            }
-            .auth-brand p {
-                color: #D1D5DB;
-            }
-            .form-label {
-                color: #E5E7EB;
-            }
-            .form-input {
-                background-color: rgba(17, 24, 39, 0.7);
-                border-color: #374151;
-                color: #F9FAFB;
-            }
-            .form-input:focus {
-                background-color: rgba(17, 24, 39, 0.9);
-                border-color: var(--primary);
-            }
-            .auth-footer {
-                border-top-color: rgba(255,255,255,0.05);
-            }
-            .alert-danger {
-                background-color: rgba(239, 68, 68, 0.1);
-                color: #F87171;
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        primary: { 50: '#f0fdfa', 100: '#ccfbf1', 200: '#99f6e4', 300: '#5eead4', 400: '#2dd4bf', 500: '#14b8a6', 600: '#0d9488', 700: '#0f766e', 800: '#115e59', 900: '#134e4a', 950: '#042f2e' },
+                        neutralbg: '#f9fafb',
+                        success: '#10b981',
+                        warning: '#f59e0b',
+                        danger: '#ef4444',
+                    },
+                    boxShadow: {
+                        'glass': '0 25px 50px -12px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.5) inset',
+                    }
+                }
             }
         }
-    </style>
+    </script>
+    
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body>
-    <div class="auth-page">
-        <div class="auth-container">
-            <div class="auth-card">
-                <div class="auth-brand">
-                    <div class="brand-icon">🏠</div>
-                    <h2>Welcome Back</h2>
-                    <p>Sign in to manage your properties</p>
+<body class="font-sans text-gray-900 bg-neutralbg h-screen w-full flex overflow-hidden">
+    
+    <!-- LEFT SIDE: Illustration & Brand -->
+    <div class="hidden lg:flex lg:w-1/2 relative flex-col justify-between p-12 bg-gradient-to-br from-primary-700 to-primary-900 overflow-hidden">
+        <!-- Abstract background pattern / illustration overlay -->
+        <div class="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center bg-no-repeat mix-blend-overlay"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-primary-900 via-transparent to-transparent opacity-80"></div>
+        
+        <div class="relative z-10 flex items-center space-x-3 text-white">
+            <div class="w-10 h-10 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/30">
+                <i data-lucide="building-2" class="w-6 h-6 text-white"></i>
+            </div>
+            <span class="text-2xl font-bold tracking-tight">TenancyFlow</span>
+        </div>
+        
+        <div class="relative z-10 mb-10">
+            <h1 class="text-5xl font-bold text-white leading-tight mb-6">
+                Manage Your <br/>Properties Effortlessly
+            </h1>
+            <p class="text-primary-100 text-lg max-w-md">
+                The global standard SaaS platform for premium property management, empowering modern agents and landlords in 2026.
+            </p>
+            
+            <div class="flex items-center space-x-4 mt-12">
+                <div class="flex -space-x-3">
+                    <img class="w-10 h-10 rounded-full border-2 border-primary-800" src="https://i.pravatar.cc/100?img=1" alt="User">
+                    <img class="w-10 h-10 rounded-full border-2 border-primary-800" src="https://i.pravatar.cc/100?img=2" alt="User">
+                    <img class="w-10 h-10 rounded-full border-2 border-primary-800" src="https://i.pravatar.cc/100?img=3" alt="User">
                 </div>
-
-                {% if form.errors %}
-                    <div class="alert alert-danger">
-                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-                        </svg>
-                        <span>Invalid username or password. Please try again.</span>
-                    </div>
-                {% endif %}
-
-                <form method="post" action="{% url 'accounts:login' %}">
-                    {% csrf_token %}
-                    <div class="form-group">
-                        <label class="form-label" for="id_username">Username</label>
-                        {{ form.username }}
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="id_password">Password</label>
-                        {{ form.password }}
-                    </div>
-                    <button type="submit" class="btn btn-primary">
-                        Sign In <span class="arrow">→</span>
-                    </button>
-                </form>
-
-                <div class="auth-footer">
-                    Want to use TenancyFlow for your property management? <br>
-                    <a href="mailto:hello@tenancyflow.com">Contact Sales for an Invite</a>
+                <div class="text-sm text-primary-50">
+                    <div class="font-semibold">Trusted by 2,000+</div>
+                    <div class="opacity-80">Real Estate Professionals</div>
                 </div>
             </div>
         </div>
     </div>
+    
+    <!-- RIGHT SIDE: Login Card -->
+    <div class="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 relative bg-neutralbg/50 backdrop-blur-sm">
+        <!-- Mobile Brand -->
+        <div class="absolute top-8 left-8 flex items-center space-x-2 text-primary-800 lg:hidden">
+            <div class="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center shadow-lg">
+                <i data-lucide="building-2" class="w-5 h-5 text-white"></i>
+            </div>
+            <span class="text-xl font-bold tracking-tight">TenancyFlow</span>
+        </div>
+
+        <div class="w-full max-w-md" x-data="{ loading: false, showPassword: false }">
+            <!-- Glassy Card for Login -->
+            <div class="bg-white/80 backdrop-blur-xl rounded-3xl p-8 shadow-glass border border-white/60 relative overflow-hidden">
+                <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-primary-400 to-primary-600"></div>
+                
+                <h2 class="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h2>
+                <p class="text-gray-500 mb-8">Sign in to your dashboard to continue.</p>
+                
+                {% if form.errors %}
+                <div class="mb-6 p-4 rounded-xl bg-danger/10 border border-danger/20 flex items-start space-x-3 text-danger">
+                    <i data-lucide="alert-circle" class="w-5 h-5 flex-shrink-0 mt-0.5"></i>
+                    <span class="text-sm font-medium">Invalid username or password. Please try again.</span>
+                </div>
+                {% endif %}
+                
+                <form method="post" action="{% url 'accounts:login' %}" @submit="loading = true" class="space-y-5">
+                    {% csrf_token %}
+                    
+                    <!-- Username (labeled as Email in the prompt request, although form may expect username, keeping visually as Email or Username depending on context. The prompt says 'Fields: Email, Password'. I'll label it Email/Username) -->
+                    <div class="space-y-1.5">
+                        <label class="text-sm font-medium text-gray-700 block" for="{{ form.username.id_for_label }}">Email</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                                <i data-lucide="mail" class="w-5 h-5 text-gray-400"></i>
+                            </div>
+                            <input type="text" name="{{ form.username.name }}" id="{{ form.username.id_for_label }}" required
+                                class="w-full pl-11 pr-4 py-3 bg-gray-50/50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all placeholder-gray-400"
+                                placeholder="name@company.com">
+                        </div>
+                    </div>
+                    
+                    <!-- Password -->
+                    <div class="space-y-1.5">
+                        <div class="flex items-center justify-between">
+                            <label class="text-sm font-medium text-gray-700 block" for="{{ form.password.id_for_label }}">Password</label>
+                            <a href="#" class="text-sm font-medium text-primary-600 hover:text-primary-700 hover:underline transition-all">Forgot password?</a>
+                        </div>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                                <i data-lucide="lock" class="w-5 h-5 text-gray-400"></i>
+                            </div>
+                            <!-- Added Alpine logic for toggling password visibility -->
+                            <input :type="showPassword ? 'text' : 'password'" name="{{ form.password.name }}" id="{{ form.password.id_for_label }}" required
+                                class="w-full pl-11 pr-12 py-3 bg-gray-50/50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all placeholder-gray-400"
+                                placeholder="••••••••">
+                            <button type="button" @click="showPassword = !showPassword" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-gray-600 transition-colors">
+                                <i x-show="!showPassword" data-lucide="eye" class="w-5 h-5"></i>
+                                <i x-show="showPassword" data-lucide="eye-off" class="w-5 h-5" x-cloak></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Login Button -->
+                    <button type="submit" :disabled="loading"
+                        class="w-full flex justify-center items-center py-3 px-4 bg-primary-600 hover:bg-primary-700 text-white text-sm font-semibold rounded-xl shadow-lg shadow-primary-500/30 hover:shadow-primary-600/40 transition-all transform active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed mt-2">
+                        <span x-show="!loading">Sign In</span>
+                        <div x-show="loading" class="flex items-center space-x-2" x-cloak>
+                            <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>
+                            <span>Signing in...</span>
+                        </div>
+                    </button>
+                    
+                    <!-- Divider -->
+                    <div class="relative flex items-center py-2">
+                        <div class="flex-grow border-t border-gray-200"></div>
+                        <span class="flex-shrink-0 mx-4 text-xs font-medium text-gray-400 uppercase tracking-wider">or continue with</span>
+                        <div class="flex-grow border-t border-gray-200"></div>
+                    </div>
+                    
+                    <!-- Google Login Button -->
+                    <button type="button" 
+                        class="w-full flex justify-center items-center py-3 px-4 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 text-sm font-semibold rounded-xl shadow-sm transition-all transform active:scale-[0.98]">
+                        <svg class="w-5 h-5 mr-3" viewBox="0 0 24 24">
+                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                        </svg>
+                        Google
+                    </button>
+                    
+                </form>
+                
+                <p class="mt-8 text-center text-sm text-gray-500">
+                    Don't have an account? 
+                    <a href="#" class="font-semibold text-primary-600 hover:text-primary-700 transition-colors">Create account</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Initialize Lucide Icons -->
+    <script>
+        lucide.createIcons();
+    </script>
 </body>
 </html>

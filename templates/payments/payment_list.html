@@ -6,88 +6,125 @@
 {% block page_subtitle %}{{ total_payments }} payment{{ total_payments|pluralize }} recorded{% endblock %}
 
 {% block page_actions %}
-<a href="{% url 'payments:create' %}" class="btn btn-primary">+ Record Payment</a>
+<a href="{% url 'payments:create' %}" class="inline-flex items-center px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-semibold rounded-xl shadow-lg shadow-primary-500/30 hover:shadow-primary-600/40 transition-all transform active:scale-95">
+    <i data-lucide="plus" class="w-4 h-4 mr-2"></i> Record Payment
+</a>
 {% endblock %}
 
 {% block content %}
 <!-- Total Summary -->
-<div class="stats-grid" style="margin-bottom: var(--space-xl);">
-    <div class="stat-card success">
-        <div class="stat-icon success">💰</div>
-        <div class="stat-value">₦{{ total_collected|intcomma }}</div>
-        <div class="stat-label">Total Collected (Confirmed)</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+    <div class="bg-gradient-to-br from-success/90 to-success/70 border border-success/20 rounded-2xl p-6 shadow-[0_4px_15px_-3px_rgba(16,185,129,0.3)] text-white relative overflow-hidden group">
+        <div class="absolute -right-4 -top-4 w-24 h-24 bg-white/10 rounded-full blur-xl group-hover:scale-150 transition-transform duration-700"></div>
+        <div class="flex items-center justify-between relative z-10">
+            <div>
+                <p class="text-sm font-medium text-white/80 mb-1 uppercase tracking-wide">Total Collected (Confirmed)</p>
+                <h3 class="text-3xl font-extrabold tracking-tight">₦{{ total_collected|intcomma }}</h3>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center text-white backdrop-blur-sm border border-white/20 shadow-inner">
+                <i data-lucide="wallet" class="w-6 h-6"></i>
+            </div>
+        </div>
     </div>
 </div>
 
-<form method="get" class="filter-bar">
-    <div class="search-box">
-        <span class="search-icon">🔍</span>
-        <input type="text" name="search" value="{{ search }}" placeholder="Search by tenant, reference..." class="form-input">
-    </div>
-    <select name="method" class="filter-select" onchange="this.form.submit()">
-        <option value="">All Methods</option>
-        <option value="cash" {% if method_filter == 'cash' %}selected{% endif %}>Cash</option>
-        <option value="transfer" {% if method_filter == 'transfer' %}selected{% endif %}>Bank Transfer</option>
-        <option value="cheque" {% if method_filter == 'cheque' %}selected{% endif %}>Cheque</option>
-        <option value="pos" {% if method_filter == 'pos' %}selected{% endif %}>POS</option>
-        <option value="online" {% if method_filter == 'online' %}selected{% endif %}>Online</option>
-    </select>
-    <select name="status" class="filter-select" onchange="this.form.submit()">
-        <option value="">All Status</option>
-        <option value="confirmed" {% if status_filter == 'confirmed' %}selected{% endif %}>Confirmed</option>
-        <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
-        <option value="cancelled" {% if status_filter == 'cancelled' %}selected{% endif %}>Cancelled</option>
-    </select>
-    <button type="submit" class="btn btn-secondary">Search</button>
-</form>
+<div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-4 mb-6 shadow-sm">
+    <form method="get" class="flex flex-col md:flex-row md:items-center gap-4">
+        <div class="relative flex-grow">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i data-lucide="search" class="w-5 h-5 text-gray-400"></i>
+            </div>
+            <input type="text" name="search" value="{{ search }}" placeholder="Search by tenant, reference..." 
+                class="w-full pl-10 pr-4 py-2.5 bg-gray-50/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:bg-white dark:focus:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 text-gray-900 dark:text-gray-100 placeholder-gray-400 transition-all">
+        </div>
+        <select name="method" onchange="this.form.submit()" class="px-4 py-2.5 bg-gray-50/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:bg-white dark:focus:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 text-gray-900 dark:text-gray-100 cursor-pointer">
+            <option value="">All Methods</option>
+            <option value="cash" {% if method_filter == 'cash' %}selected{% endif %}>Cash</option>
+            <option value="transfer" {% if method_filter == 'transfer' %}selected{% endif %}>Bank Transfer</option>
+            <option value="cheque" {% if method_filter == 'cheque' %}selected{% endif %}>Cheque</option>
+            <option value="pos" {% if method_filter == 'pos' %}selected{% endif %}>POS</option>
+            <option value="online" {% if method_filter == 'online' %}selected{% endif %}>Online</option>
+        </select>
+        <select name="status" onchange="this.form.submit()" class="px-4 py-2.5 bg-gray-50/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:bg-white dark:focus:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 text-gray-900 dark:text-gray-100 cursor-pointer">
+            <option value="">All Status</option>
+            <option value="confirmed" {% if status_filter == 'confirmed' %}selected{% endif %}>Confirmed</option>
+            <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
+            <option value="cancelled" {% if status_filter == 'cancelled' %}selected{% endif %}>Cancelled</option>
+        </select>
+        <button type="submit" class="hidden md:inline-flex px-4 py-2.5 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-xl text-sm font-semibold hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Search</button>
+    </form>
+</div>
 
 {% if payments %}
-<div class="table-container">
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Tenant</th>
-                <th>Property</th>
-                <th>Amount</th>
-                <th>Date</th>
-                <th>Method</th>
-                <th>Reference</th>
-                <th>Status</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for payment in payments %}
-            <tr>
-                <td>
-                    <a href="{% url 'tenants:detail' pk=payment.tenant.pk %}"><strong>{{ payment.tenant.name }}</strong></a>
-                </td>
-                <td>{{ payment.tenant.building.name }}</td>
-                <td><strong>₦{{ payment.amount|intcomma }}</strong></td>
-                <td>{{ payment.payment_date|date:"M d, Y" }}</td>
-                <td>{{ payment.get_payment_method_display }}</td>
-                <td>{{ payment.reference|default:"-" }}</td>
-                <td>
-                    <span class="badge {% if payment.status == 'confirmed' %}badge-success{% elif payment.status == 'pending' %}badge-warning{% else %}badge-danger{% endif %}">
-                        {{ payment.get_status_display }}
-                    </span>
-                </td>
-                <td>
-                    <a href="{% url 'payments:delete' pk=payment.pk %}" class="btn btn-sm btn-secondary">🗑️</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm overflow-hidden flex flex-col">
+    <div class="flex-1 overflow-x-auto">
+        <table class="w-full text-sm text-left whitespace-nowrap">
+            <thead class="text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800/80 uppercase font-bold tracking-wider">
+                <tr>
+                    <th scope="col" class="px-6 py-4">Tenant</th>
+                    <th scope="col" class="px-6 py-4">Property</th>
+                    <th scope="col" class="px-6 py-4">Amount</th>
+                    <th scope="col" class="px-6 py-4">Date</th>
+                    <th scope="col" class="px-6 py-4">Method</th>
+                    <th scope="col" class="px-6 py-4">Reference</th>
+                    <th scope="col" class="px-6 py-4">Status</th>
+                    <th scope="col" class="px-6 py-4 text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                {% for payment in payments %}
+                <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors group">
+                    <td class="px-6 py-4">
+                        <a href="{% url 'tenants:detail' pk=payment.tenant.pk %}" class="flex items-center text-sm font-semibold text-gray-900 dark:text-gray-100 hover:text-primary-600 transition-colors">
+                            <div class="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900/50 text-primary-700 dark:text-primary-400 flex items-center justify-center font-bold text-xs ring-2 ring-white dark:ring-gray-900 shadow-sm mr-3">
+                                {{ payment.tenant.name|make_list|first|upper }}
+                            </div>
+                            {{ payment.tenant.name }}
+                        </a>
+                    </td>
+                    <td class="px-6 py-4 font-medium text-gray-500 dark:text-gray-400">{{ payment.tenant.building.name }}</td>
+                    <td class="px-6 py-4 font-bold text-gray-900 dark:text-gray-100">₦{{ payment.amount|intcomma }}</td>
+                    <td class="px-6 py-4 text-gray-500 dark:text-gray-400 font-medium">{{ payment.payment_date|date:"M d, Y" }}</td>
+                    <td class="px-6 py-4 text-gray-500 dark:text-gray-400">{{ payment.get_payment_method_display }}</td>
+                    <td class="px-6 py-4 font-mono text-xs text-gray-500 dark:text-gray-400">{{ payment.reference|default:"-" }}</td>
+                    <td class="px-6 py-4">
+                        {% if payment.status == 'confirmed' %}
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide bg-success/10 text-success border border-success/20">
+                                <span class="w-1.5 h-1.5 rounded-full bg-success mr-1.5"></span> Confirmed
+                            </span>
+                        {% elif payment.status == 'pending' %}
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide bg-warning/10 text-warning border border-warning/20">
+                                <span class="w-1.5 h-1.5 rounded-full bg-warning mr-1.5"></span> Pending
+                            </span>
+                        {% else %}
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide bg-danger/10 text-danger border border-danger/20">
+                                <span class="w-1.5 h-1.5 rounded-full bg-danger mr-1.5"></span> Cancelled
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td class="px-6 py-4 text-right">
+                        <div class="flex items-center justify-end space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <a href="{% url 'payments:delete' pk=payment.pk %}" class="p-1.5 text-gray-400 hover:text-danger hover:bg-danger/10 rounded-lg transition-colors" title="Delete">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% else %}
-<div class="card">
-    <div class="empty-state">
-        <div class="empty-state-icon">💳</div>
-        <h3>No payments found</h3>
-        <p>{% if search or method_filter or status_filter %}Try adjusting your filters.{% else %}Record your first payment to start tracking.{% endif %}</p>
-        <a href="{% url 'payments:create' %}" class="btn btn-primary">+ Record Payment</a>
+<div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl flex flex-col items-center justify-center p-12 text-center shadow-sm">
+    <div class="w-20 h-20 bg-success/10 rounded-full flex items-center justify-center text-success mb-5 ring-8 ring-success/5">
+        <i data-lucide="hand-coins" class="w-10 h-10"></i>
     </div>
+    <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">No payments found</h3>
+    <p class="text-sm text-gray-500 dark:text-gray-400 max-w-sm mb-6">{% if search or method_filter or status_filter %}Try adjusting your filters.{% else %}Record your first payment to start tracking.{% endif %}</p>
+    <a href="{% url 'payments:create' %}" class="inline-flex items-center px-4 py-2 bg-success hover:bg-success/90 text-white text-sm font-semibold rounded-xl shadow-lg shadow-success/30 transition-all transform active:scale-95">
+        <i data-lucide="plus" class="w-4 h-4 mr-2"></i> Record Payment
+    </a>
 </div>
 {% endif %}
 {% endblock %}
