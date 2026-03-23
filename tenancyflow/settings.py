@@ -3,27 +3,45 @@ Django settings for TenancyFlow - Property Management SaaS
 """
 
 import os
-import environ
 from pathlib import Path
-
-# Initialize environ
-env = environ.Env(
-    DEBUG=(bool, False)
-)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Read .env file if it exists
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+# Try to load .env file (won't exist on Vercel - that's fine)
+try:
+    import environ
+    env = environ.Env(DEBUG=(bool, False))
+    env_file = os.path.join(BASE_DIR, '.env')
+    if os.path.isfile(env_file):
+        environ.Env.read_env(env_file)
+except ImportError:
+    # django-environ not available, fall back to os.environ
+    class env:
+        @staticmethod
+        def __call__(key, default=None):
+            return os.environ.get(key, default)
+        @staticmethod
+        def list(key, default=None):
+            val = os.environ.get(key)
+            if val:
+                return [x.strip() for x in val.split(',')]
+            return default or []
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env('SECRET_KEY', default='django-insecure-iuoo=1#$v$$b%_4du+-ouc&^dkja$asta71o#k9wp&k)^^h!59')
+SECRET_KEY = os.environ.get(
+    'SECRET_KEY',
+    'django-insecure-iuoo=1#$v$$b%_4du+-ouc&^dkja$asta71o#k9wp&k)^^h!59'
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env('DEBUG')
+DEBUG = os.environ.get('DEBUG', 'False').lower() in ('true', '1', 'yes')
 
-ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['127.0.0.1', 'localhost', '*'])
+ALLOWED_HOSTS = [
+    h.strip()
+    for h in os.environ.get('ALLOWED_HOSTS', '127.0.0.1,localhost,*').split(',')
+    if h.strip()
+]
 
 # Application definition
 INSTALLED_APPS = [
@@ -73,16 +91,19 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'tenancyflow.wsgi.application'
 
-import dj_database_url
-
 # Database configuration
+# Check for DATABASE_URL or POSTGRES_URL (Vercel sets POSTGRES_URL)
 db_url = os.environ.get('DATABASE_URL') or os.environ.get('POSTGRES_URL')
+
+# Filter out empty strings (e.g. DATABASE_URL= in .env)
+if db_url and db_url.strip() == '':
+    db_url = None
 
 # Default to SQLite for local development
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / "db.sqlite3",
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
@@ -91,8 +112,7 @@ if db_url:
     import dj_database_url
     DATABASES['default'] = dj_database_url.parse(db_url, conn_max_age=600)
     DATABASES['default']['CONN_HEALTH_CHECKS'] = True
-    
-    # Ensure options are set for SSL (Postgres)
+    # Ensure SSL for Postgres connections
     if 'postgres' in db_url or 'postgresql' in db_url:
         DATABASES['default'].setdefault('OPTIONS', {})
         DATABASES['default']['OPTIONS']['sslmode'] = 'require'
@@ -121,7 +141,6 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Whitenoise configuration for production
-# USE_FINDERS=True allows WhiteNoise to find files in STATICFILES_DIRS even if collectstatic hasn't run
 WHITENOISE_USE_FINDERS = True
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 WHITENOISE_KEEP_ONLY_HASHED_FILES = True
